@@ -1,0 +1,30 @@
+LIB_ANTLR := lib/antlr.jar
+ANTLR_SCRIPT := Micro.g4
+
+all: group compiler
+
+group:
+	@echo "Archit Aggarwal ECN account - aggarw13"
+
+compiler:
+	rm -rf build
+	mkdir build
+	java -cp $(LIB_ANTLR) org.antlr.v4.Tool -o build $(ANTLR_SCRIPT)
+	rm -rf classes
+	mkdir classes
+	javac -cp $(LIB_ANTLR) -d classes src/*.java build/*.java
+
+test: compiler
+	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro testfiles/sqrt.micro > outputs/sqrt.out
+	diff -B -b exp_outputs/sqrt.out outputs/sqrt.out
+	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro testfiles/nested.micro > outputs/nested.out
+	diff -B -b -y exp_outputs/nested.out outputs/nested.out
+	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro testfiles/loop.micro > outputs/loop.out
+	diff -B -b exp_outputs/loop.out outputs/loop.out
+	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro testfiles/sqrt.micro > outputs/sqrt.out
+	diff -B -b exp_outputs/fibonacci.out outputs/fibonacci.out
+
+clean:
+	rm -rf classes build
+
+.PHONY: all group compiler clean

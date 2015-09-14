@@ -18,21 +18,20 @@ class Micro
 		}
 		catch(FileNotFoundException ex) 
 		{
-            System.err.println("Invalid micro file!");
+            		System.err.println("Invalid micro file!");
 		}	        
 		MicroLexer lexer = new MicroLexer(data);
 		Token token = lexer.nextToken();
-		BufferedTokenStream tokenStream = new BufferedTokenStream(lexer);
+		String[] tokenNames = lexer.getTokenNames();
+		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		MicroParser parser = new MicroParser(tokenStream);
-		parser.setErrorHandler(new MicroErrorStrategy());
-		try
+		ANTLRErrorStrategy errorStrat = new MicroErrorStrategy();
+		parser.setErrorHandler(errorStrat);
+		parser.program();	
+		/*catch(Exception e)
 		{
-			parser.program();
-			System.out.println("Accepted");
-		}
-		catch(Exception e)
-		{
-			//System.err.println("Not Accepted");
-		}
+			System.err.println("Not Accepted");
+		}*/
+		System.out.println("Accepted");
 	}
 }
