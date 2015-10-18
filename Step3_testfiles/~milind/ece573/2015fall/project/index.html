@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>ECE 468/573 Project Home Page</title>
+</head>
+<body>
+<h1><center>ECE 468/573 Project Home Page</center></h1>
+
+<h2>Announcements</h2>
+<ul>
+  <li>9/5: Step 2 has been posted.</li>
+  <li>8/28: Step 1 has been posted. Testcases are coming soon.</li>
+	<li>8/16: Step 0 has been posted.</li>
+</ul>
+
+<h2>Introduction</h2>
+<p>This project consists of implementing a simple compiler for the so called <a href="grammar.txt">LITTLE programming language</a>. The LITTLE language is a toy programming language designed solely for this course and it's based (however different!) on the MICRO language described in the course text book. Pay careful attention: <b>ECE 573 students have a slightly different grammar than ECE 468 students</b><p>
+
+<h2>Project TA</h2>
+<p>Aurangzeb will be grading the projects and answering questions. You can get in touch with him at orangzeb 'at' purdue 'dot' edu. He will also be in EE 206 from 5:30pm&ndash;7pm on Wednesdays, and 2:30pm&ndash;4pm on Fridays.</p>
+
+<h2>Project Steps</h2>
+<ul>
+<li><a href="step0/step0.html">Step 0</a> - Submission test and group selection <em>Due on: Fri, Aug. 28th</em></li>  
+<li><a href="step1/step1.html">Step 1</a> - Scanner (Tokenizer) (100 points) <em>Due on: Friday, Sep. 4th</em></li>
+<li><a href="step2/step2.html">Step 2</a> - Parser (100 points) <em>Due on: Fri, Sep. 18th</em></li>
+<li><a href="step3/step3.html">Step 3</a> - Symbol Table (100 points) <em>Due <strike>Fri, Oct. 3rd</strike> Mon, Oct. 5th</em></li>
+<!--
+<li><a href="step4/step4.html">Step 4</a> - Semantic actions for expressions and assignment statements (100 points) <em>Due on: Friday, Oct. 17th</em></li>
+<li><a href="step5/step5.html">Step 5</a> - Semantic actions for control structures (100 points) <em>Due on: Friday, Nov. 7th</em></li>
+<li><a href="step6/step6.html">Step 6</a> - Semantic actions for function calls (100 points) <em>Due on: Friday, Nov. 21st</em></li>
+<li><a href="step7/step7.html">Step 7</a> - Register allocation (100 points) <em>Due on: Monday, Dec. 8th</em></li>
+<li><a href="step8/step8.html">Step 8</a> - Final turn-in.
+<em>Due on: Friday, Dec. 12th</em></li>-->
+</ul>
+
+<p><strong>Grading policy:</strong> All the points from the first 7 steps add up to 700 points (plus 10 bonus points from step0) and are worth total 30% of the project's total grade. The final step is worth 70% of the project's grade. Any submission will be tested against a set of published and hidden datasets.</p>
+<!-- , 60% of the final grade given based on your -->
+<!-- compiler's ability of compiling all the testcases (programs written in -->
+<!-- the LITTLE language) given during the semester and 10% of the project's -->
+<!-- grade given based on your compiler's ability of passing<span -->
+<!--  style="text-decoration: underline;"> hidden testcases</span> prepared -->
+<!-- by the course TAs.<br> -->
+
+<h2>Building your compiler</h2>
+
+<p>While you can write your compiler in any language you would like, using any toolkits you have access to, we <i>highly</i> recommend that you use either ANTLR (<a href="http://www.antlr.org">http://www.antlr.org</a>) or Flex/Bison (already installed on ECN systems) to build your compiler. ANTLR is a Java-based toolkit, while Flex/Bison are C++-based. We will be able to provide technical support <i>only</i> for these two tools (though we will, of course, provide conceptual help regardless of which language you choose for development).</p>
+
+<p>If you are using ANTLR, you will find its <a href="http://www.antlr.org/api/Java/index.html">API documentation</a> invaluable. If you ware using Flex/Bison, a useful reference is <a href="bison.html#C_002b_002b-Language-Interface">here</a>. A working example can be found <a href="calc++.tar.gz">here</a>.</p>
+
+
+<h2>Running your compiler</h2>
+<p>We will compiler your compiler by running:</p>
+<blockquote>
+  <pre>make clean; make compiler</pre>
+</blockquote>
+<p>Submit all source files and libraries necessary to build your compiler. <i>Do not submit generated ANTLR-generated .java or Flex/Bison-generated .c/.cpp files</i>. Submit the original source files and ensure that the Makefile calls ANTLR, Flex, Bison, etc. as part of its build process.</p>
+
+<p>This is how we will test your compiler in Java:</p>
+<blockquote>
+<pre>java -cp lib/antlr.jar:classes/ Micro test.micro &gt; &lt;output file&gt;</pre>
+</blockquote>
+  
+<p>This is how we will test your compiler in C/C++:</p>
+<blockquote>
+<pre>./Micro test.micro &gt; &lt;output file&gt;</pre>
+</blockquote>
+
+<p>Note that the input is being read in from a file passed as a command line argument, not redirected from STDIN, while the output is being redirected from STDOUT. <b>If you are using a different language that C/C++ or Java, include a shell script in your submission called "Micro" that provides the same usage interface as in the C/C++ case above</b></p>
+
+<p>We will be testing your project on the ecegrid machines, so please make sure that your projects compile and run on those systems!</p>
+
+<h2>Testing your generated code</h2>
+
+<p>For project steps 4&ndash;7, we will be testing your compiler by running your generated code through the Tiny simulator, a program that simulates a machine that supports the <a href="http://dynamo.ecn.purdue.edu/%7Eeigenman/ECE573/tiny/tiny.txt">Tiny instruction set</a>. A Linux version of the Tiny simulator is available <a href="step4/tinyR">here</a>. You can also compile the <a href="tinyNew.C">Tiny simulator source</a> yourself (you can change the number of registers by changing the NUMREGS #define).</p>
+
+<h2>Submission Instructions</h2>
+
+<p>See <a href="directory.html">this page</a> for the necessary directory structure for your project.</p>
+
+<p>Submit each step using the turnin command. Instructions for using turnin are available <a href="turnin.html">here</a>.</p>
+
+</body>
+</html>

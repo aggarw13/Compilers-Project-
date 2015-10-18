@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /Intranet/Groups/
+Disallow: /CE/Academics/IndustryOpps
+Disallow: /Engr/Research/SURF/Students/
+Disallow: /DevProEd/
+Disallow: /Dev*
+Disallow: /~asce/pages/events/
+Disallow: /AAE/Academics/Courses/aae490t/AAE_490T_Spring_2003/
+
+Crawl-delay: 5

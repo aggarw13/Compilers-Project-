@@ -1,0 +1,13 @@
+Arguments to file
+[Ljava.lang.String;@5de9c245
+Starts creating AST!
+Symbol table GLOBAL
+name i type INT
+name a type INT
+name b type INT
+name c type INT
+name x type FLOAT
+name y type FLOAT
+name z type FLOAT
+name h type INT
+name s1 type STRING value "string"

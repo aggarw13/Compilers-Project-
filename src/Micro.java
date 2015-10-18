@@ -7,6 +7,7 @@ class Micro
 {
 	public static void main (String[] args) throws Exception
 	{
+		System.out.println("Arguments to file\n" + args);
 		ANTLRFileStream data = null;
 		try
 		{
@@ -18,21 +19,28 @@ class Micro
 		}
 		catch(FileNotFoundException ex) 
 		{
-            System.err.println("Invalid micro file!");
+         	System.err.println("Invalid micro fil0e!");
 		}	        
 		MicroLexer lexer = new MicroLexer(data);
-		Token token = lexer.nextToken();
-		BufferedTokenStream tokenStream = new BufferedTokenStream(lexer);
+		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		MicroParser parser = new MicroParser(tokenStream);
 		parser.setErrorHandler(new MicroErrorStrategy());
 		try
 		{
 			parser.program();
-			System.out.println("Accepted");
+			System.out.println("Starts creating AST!");
+			//SemanticDataHandler.printSemanticStack(SemanticDataHandler.globalScope);
+			for(ASTNode root : ASTStackHandler.getASTFIFO())
+			{
+				ASTStackHandler.traverseTree(root);
+				System.out.print("\n");
+			}
+
+			//ParseTreeWalker walker = new ParseTreeWalker();
+			//SemanticDataBuilder semanticStack = new SemanticDataBuilder(parser);						
 		}
 		catch(Exception e)
 		{
-			//System.err.println("Not Accepted");
 		}
 	}
 }

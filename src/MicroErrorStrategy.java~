@@ -1,0 +1,25 @@
+import org.antlr.v4.runtime.*;
+import java.io.*;
+import java.util.*;
+import java.lang.Exception.*;
+
+public class MicroErrorStrategy extends DefaultErrorStrategy
+{
+	public MicroErrorStrategy()
+	{
+		super();
+	}
+
+	@Override
+	public void reportError(Parser Recognizer,  RecognitionException e)
+	{
+		System.out.println("Not accepted");	
+	}
+
+	@Override
+	public Token recoverInline(Parser Recognizer)
+	{
+		//System.out.println("Not accepted");	
+		return null;
+	}
+}

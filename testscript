@@ -1,0 +1,29 @@
+#! /bin/bash
+make compiler
+
+if [ $1 == 1 ]
+then
+	make test4 TESTARGS='step4_testcase3'
+else
+	make test4 TESTARGS='test_expr'
+fi
+
+
+#make test3 TESTARGS='test1'
+#make test3 TESTARGS='test5'
+#make test3 TESTARGS='test6'
+#make test3 TESTARGS='test7'
+#make test3 TESTARGS='test8'
+#make test3 TESTARGS='test9'
+
+#make test3 TESTARGS='test11'
+#make test3 TESTARGS='test14'
+#make test3 TESTARGS='test13'
+
+#make test3 TESTARGS='test16'
+
+#make test3 TESTARGS='test18'
+
+#make test3 TESTARGS='test19'
+
+#make test3 TESTARGS='test20'

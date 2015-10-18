@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>step3</title>
+</head>
+<body>
+<h1>Step 3: Symbol Table Generation - Due: <strike>Friday, October 3rd,</strike> Monday, October 5th, 11:59pm </h1>
+<h2>Introduction</h2>
+<p>Your goal in this step is to process variable declarations and create Symbol Tables. A symbol table is a data structure that keeps information about non-keyword symbols that appear in source programs. <strong>Variables</strong> and <strong>String Variables</strong> are examples of such symbols. Other example of symbols kept by the symbol table are the names of functions or procedures. The symbols added to the symbol table will be used in many of the further phases of the compilation. The diagram below shows the progress in our compiler construction at the end of this step:</p>
+<p><img alt="symbol table" src="symboltable.jpg"  style="width: 809px; height: 464px;"/></p>
+<h2>The Task: The Compiler's Symbol Table</h2>
+<p>In Step 2 you didn't need token values since only token types are used by parser generator tools to guide parsing. But in this step your parser needs to get token values such as identifier names and string literals from your scanner. You also need to add semantic actions to create symbol table entries and add those to the symbol table.</p>
+<p>In this year's variant of Micro, there are multiple <i>scopes</i> where variables can be declared:
+  <ul>
+    <li>Variables can be declared before any functions. These are "global" variables, and can be accessed from any function.</li>
+    <li>Variables can be declared as part of a function's parameter list. These are "local" to the function, and cannot be accessed by any other function.</li>
+    <li>Variables can be declared at the beginning of a function body. These are "local" to the function as well.</li>
+    <li>Variables can be declared at the beginning of a then block, an else block, or a repeat statement. These are "local" to the block itself. Other blocks, even in the same function, cannot access these variables.</li>
+  </ul>
+</p>
+
+<p>Your task in this step of the project is to construct symbol tables for each scope in your program. For each scope, construct a symbol table, then add entries to that symbol table as you see declarations. The declarations you have to handle are integer/float declarations, which should record the name and type of the variable, and string declarations, which should <i>additionally</i> record the value of the string. Note that typically function declarations/definitions would result in entries in the symbol table, too, but you do not have to record them for this step.</p>
+
+<h2>Nested symbol tables</h2>
+<p>Note that the scopes in the program are <i>nested</i> (function scopes are inside global scopes, and block scopes are nested inside function scopes, or each other). You will have to keep track of this nesting so that when a piece of code uses a variable named "x" you know which scope that variable is from.</p>
+
+<h2>Handling errors</h2>
+<p>Your compiler should output the string "DECLARATION ERROR &lt;var_name&gt;" if there are two declarations with the same name <i>in the same scope</i>. ECE 573 students: you should output the string "SHADOW WARNING &lt;var_name&gt;" if there is a declaration with the same name in two different scopes, and one is nested inside the other (in other words, when looking for name conflicts, you have to look at all enclosing scopes).</p>
+
+<h2>Output format</h2>
+<p>For each symbol table in your program, use the following format:
+<pre>
+  Symbol table &lt;scope_name&gt;
+  name &lt;var_name&gt; type &lt;type_name&gt;
+  name &lt;var_name&gt; type &lt;type_name&gt; value &lt;string_value&gt;
+  ...
+</pre>
+The global scope should be named "GLOBAL", function scopes should be given the same name as the function name, and block scopes should be called "BLOCK X" where X is a counter that increments every time you see a new block scope. Function parameters should be included as part of the function scope.</p>
+
+<p><i>The order of declarations matters!</i> We expect the entries in your symbol table to appear in the same order that they appear in the original program. Keep this in mind as you design the data structures to store your symbol tables.</p>
+
+<h2>Test cases and output</h2>
+
+<p>Test cases are available <a href="input/">here</a>, and outputs are available <a href="output/">here</a>. You are only responsible for the testcases for your class.</p>
+
+<h3>Sample Solution</h3>
+<p>To help you better test your compiler, you can try running inputs through our <a href="step3.jar">sample solution</a>. The command line to run the sample solution (assuming the .jar file is in your main project directory) is:
+  
+<pre>java -cp lib/antlr.jar:step3.jar Micro &lt;input&gt;</pre>
+  </p>
+
+<h2>Submission</h2>
+<p>The same requirements (behavior of Makefile and compiler) as in step2 apply. See <a href="../directory.html">this page</a> for clarifications on your directory structure.</p>
+<h2>References</h2>
+<ul>
+	<li><span style="font-weight: bold;">Alfred v. Aho, Ravi Sethi, Jeffrey D. Ullman, "Compilers: Principles, Techniques, and Tools", Addison-Wesley, 1986.</span><br>
+	<span style="font-style: italic;">Symbol Tables</span> - Chapter 7.6</li>
+	<li><span style="font-weight: bold;">Andrew W. Appel, "Modern Compiler Implementation in Java", Cambridge Univ. Press, 1998</span>.<br>
+	<span style="font-style: italic;">Symbol Table</span> - Chapter 5.1</li>
+	<li><span style="font-weight: bold;">Charles Fischer, Richard LeBlanc, "Crafting a Compiler with C", The Benjamin/Commings Publishing Company, Inc, 1991.</span><br>
+	<span style="font-style: italic;">Symbol Tables</span> - Chapter 8</li>
+</ul>
+</body>
+</html>

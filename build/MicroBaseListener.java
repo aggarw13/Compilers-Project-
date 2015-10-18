@@ -367,19 +367,6 @@ public class MicroBaseListener implements MicroListener {
 	 * <p/>
 	 * The default implementation does nothing.
 	 */
-	@Override public void enterWhile_stmt(@NotNull MicroParser.While_stmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 * <p/>
-	 * The default implementation does nothing.
-	 */
-	@Override public void exitWhile_stmt(@NotNull MicroParser.While_stmtContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 * <p/>
-	 * The default implementation does nothing.
-	 */
 	@Override public void enterVar_decl(@NotNull MicroParser.Var_declContext ctx) { }
 	/**
 	 * {@inheritDoc}

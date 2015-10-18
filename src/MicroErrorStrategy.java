@@ -3,46 +3,24 @@ import java.io.*;
 import java.util.*;
 import java.lang.Exception.*;
 
-public class MicroErrorStrategy implements ANTLRErrorStrategy
+public class MicroErrorStrategy extends DefaultErrorStrategy
 {
 	public MicroErrorStrategy()
 	{
-	}
-
-	@Override
-	public boolean inErrorRecoveryMode(Parser recognizer)
-	{
-		return false;
-	}
-
-	@Override
-	public void recover(Parser recognizer, RecognitionException e)
-	{
-		System.out.println("Not accepted");
+		super();
 	}
 
 	@Override
 	public void reportError(Parser Recognizer,  RecognitionException e)
 	{
 		System.out.println("Not accepted");	
+		throw new RuntimeException(e);
 	}
 
 	@Override
 	public Token recoverInline(Parser Recognizer)
 	{
 		System.out.println("Not accepted");	
-		return null;
+		throw new RuntimeException(new Exception());
 	}
-
-	@Override
-	public void reportMatch(Parser Recognizer)
-	{}
-
-	@Override
-	public void reset(Parser Recognizer)
-	{}
-
-	@Override
-	public void sync(Parser Recognizer)
-	{}
 }
