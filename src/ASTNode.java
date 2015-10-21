@@ -22,9 +22,8 @@ class ASTNode
 		this.nodeInfo = new ASTNodeProp();
 		this.id_value = IDVal;
 		this.nodeInfo.type = type;
-		//System.out.println("Enters constructor of Node\n");
 		this.scopeTable = scope;
-
+		this.setDataObject();
 	}
 
 	public String getNameValue()
@@ -35,6 +34,11 @@ class ASTNode
 	public void setOperation(OPERATION op)
 	{
 		this.nodeInfo.operator = op;
+	}
+
+	public OPERATION getOperation()
+	{
+		return nodeInfo.operator;
 	}
 
 	public ASTNodeType getType()
@@ -104,35 +108,49 @@ class ASTNode
 		switch(this.nodeInfo.type)
 		{
 			case ASSIGNMENT : code = generateIR.assignmentOp(this.leftNode.getDataObject(), this.rightNode.getDataObject()); break;
-			case OPERATOR : code = generateIR.arithmeticOp(this.nodeInfo.operator, this.leftNode.getDataObject(), this.rightNode.getDataObject());
-							this.nodeData.setDest(Integer.toString(generateIR.tempNumber - 1)); break;
-			case IO : generateIR.IOop(this.nodeInfo.ioOp, this.id_value, this.scopeTable);
+			case OPERATOR : 
+							code = generateIR.arithmeticOp(this.nodeInfo.operator, this.leftNode.getDataObject(), this.rightNode.getDataObject());
+							this.nodeData.setDest(Integer.toString(generateIR.tempNumber - 1)); 
+							if(code.opcode.name().substring(code.opcode.name().length() - 1).equals("F"))
+								this.nodeData.setDataType(VARTYPE.FLOAT);
+							else if(code.opcode.name().substring(code.opcode.name().length() - 1).equals("I"))
+								this.nodeData.setDataType(VARTYPE.INT);
+							break;
+			case IO : for(String id : this.leftNode.getNameValue().split(",")){
+						generateIR.IOop(this.nodeInfo.ioOp, id, SemanticDataHandler.findRecordScope(id, scopeTable));}
 		}					  		
 	}
-
 
 	public void setDataObject()
 	{
 		if(this.nodeInfo.type == ASTNodeType.IDENTIFIER)
 		{
+			//System.out.println("Enters IDentifier : "+this.getType().name());
 			this.nodeData.setDest(this.id_value);
+			//System.out.println("")
 			this.nodeData.setType(DataObject.TYPE.L);
-			this.nodeData.setDataType(SemanticDataHandler.currentScope.getRecord(this.id_value).getType());
+			if(scopeTable != null)
+				this.nodeData.setDataType(scopeTable.getRecord(this.id_value).getType());
+			//System.out.print("Exits Identifier");
 		}
 		else if(this.nodeInfo.type == ASTNodeType.LITERAL)
 		{
+			//System.out.println("Enters Literal");
 			if(this.id_value.indexOf('.') != -1)
 				this.nodeData.setDataType(VARTYPE.FLOAT);
 			else
 				this.nodeData.setDataType(VARTYPE.INT);
-			
-			this.nodeData.setType(DataObject.TYPE.R);
+			this.nodeData.setType(DataObject.TYPE.CONSTANT);
+			this.nodeData.setDest(this.id_value);
+			//System.out.print("Exits Literal");
 		}
 		else if(this.nodeInfo.type == ASTNodeType.OPERATOR)
 		{
+			//System.out.println("Enters Operator object creation");
 			this.nodeData.setType(DataObject.TYPE.R);	
-			this.nodeData.setDataType(this.leftNode.getDataObject().getDataType());
-		}
 
+			//System.out.println("Exits Operator object creation");
+			//this.nodeData.setDataType(this.leftNode.getDataObject().getDataType());
+		}
 	}
 }

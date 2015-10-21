@@ -15,7 +15,7 @@ public class SemanticDataHandler{
 	
 	static SymbolTable currentScope = null;
 	static short blockScopeCount = 0;
-	static SymbolTable globalScope;
+	static SymbolTable globalScope = null;
 
 	public static void pushNewScope(SCOPE scope, String name)
 	{
@@ -27,9 +27,7 @@ public class SemanticDataHandler{
 		newScope.setEnclosingScope(currentScope);
 		currentScope = newScope; 
 		if(scope == SCOPE.GLOBAL)
-		{
 			globalScope = currentScope;
-		}
 	}
 
 	public static void popCurrentScope()
@@ -74,6 +72,20 @@ public class SemanticDataHandler{
 			System.out.println("DECLARATION ERROR "+name);
 			System.exit(0);
 		}
+	}
+
+	public static SymbolTable findRecordScope(String recName, SymbolTable baseScope)
+	{
+		boolean foundScope = false;
+		SymbolTable scope = baseScope;
+		while(!foundScope && scope != null)
+		{
+			if(scope.getRecords().contains(recName))
+				foundScope = true;
+			else
+				scope = scope.getEnclosingScope();
+		}
+		return scope;
 	}
 
 }

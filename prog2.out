@@ -1,0 +1,194 @@
+;STOREI 1 $T1
+;STOREI $T1 a
+;STOREI 2 $T2
+;STOREI $T2 b
+;STOREI 10 $T3
+;STOREI $T3 c
+;STOREI 20 $T4
+;STOREI $T4 d
+;WRITEI a
+;WRITEI b
+;WRITEI c
+;WRITEI d
+;ADDI a b $T5
+;STOREI $T5 a
+;WRITEI a
+;MULTI a c $T6
+;STOREI $T6 b
+;WRITEI b
+;SUBI 0 a $T7
+;ADDI $T7 b $T8
+;STOREI $T8 c
+;WRITEI c
+;SUBI 0 d $T9
+;STOREI $T9 d
+;WRITEI d
+;ADDI a b $T10
+;ADDI d c $T11
+;MULTI $T10 $T11 $T12
+;ADDI a b $T13
+;ADDI $T13 c $T14
+;ADDI $T14 d $T15
+;DIVI $T15 a $T16
+;SUBI $T12 $T16 $T17
+;STOREI $T17 a
+;WRITEI a
+;ADDI a 10 $T18
+;STOREI $T18 a
+;WRITEI a
+;ADDI b a $T19
+;ADDI $T19 10 $T20
+;STOREI $T20 b
+;WRITEI b
+;SUBI 0 10 $T21
+;STOREI $T21 c
+;WRITEI c
+;STOREF 1.0 $T22
+;STOREF $T22 x
+;STOREF 2.0 $T23
+;STOREF $T23 y
+;STOREF 3.14159 $T24
+;STOREF $T24 z
+;WRITEF x
+;WRITEF z
+;WRITEF y
+;DIVF z 2.0 $T25
+;STOREF $T25 x
+;DIVF z y $T26
+;STOREF $T26 y
+;WRITEF x
+;WRITEF y
+;ADDF x y $T27
+;ADDF $T27 z $T28
+;DIVF $T28 z $T29
+;STOREF $T29 t
+;WRITEF t
+;MULTF t t $T30
+;STOREF $T30 t
+;WRITEF t
+;ADDF t z $T31
+;ADDF $T31 t $T32
+;DIVF t 2.0 $T33
+;ADDF $T32 $T33 $T34
+;DIVF z 4.0 $T35
+;ADDF $T34 $T35 $T36
+;DIVF z 5.0 $T37
+;ADDF $T36 $T37 $T38
+;DIVF z 6.0 $T39
+;ADDF $T38 $T39 $T40
+;DIVF z 7.0 $T41
+;ADDF $T40 $T41 $T42
+;STOREF $T42 t
+;WRITEF t
+;Tiny Code
+var a
+var b
+var c
+var d
+var x
+var y
+var z
+var t
+move 1 r1
+move r1 a
+move 2 r2
+move r2 b
+move 10 r3
+move r3 c
+move 20 r4
+move r4 d
+sys writei a
+sys writei b
+sys writei c
+sys writei d
+move a r5
+addi b r5
+move r5 a
+sys writei a
+move a r6
+muli c r6
+move r6 b
+sys writei b
+move 0 r7
+subi a r7
+addi b r7
+move r7 c
+sys writei c
+move 0 r8
+subi d r8
+move r8 d
+sys writei d
+move a r9
+addi b r9
+move d r10
+addi c r10
+muli r10 r9
+move a r11
+addi b r11
+addi c r11
+addi d r11
+divi a r11
+subi r11 r9
+move r9 a
+sys writei a
+move a r12
+addi 10 r12
+move r12 a
+sys writei a
+move b r13
+addi a r13
+addi 10 r13
+move r13 b
+sys writei b
+move 0 r14
+subi 10 r14
+move r14 c
+sys writei c
+move 1.0 r15
+move r15 x
+move 2.0 r16
+move r16 y
+move 3.14159 r17
+move r17 z
+sys writer x
+sys writer z
+sys writer y
+move z r18
+divr 2.0 r18
+move r18 x
+move z r19
+divr y r19
+move r19 y
+sys writer x
+sys writer y
+move x r20
+addr y r20
+addr z r20
+divr z r20
+move r20 t
+sys writer t
+move t r21
+mulr t r21
+move r21 t
+sys writer t
+move t r22
+addr z r22
+addr t r22
+move t r23
+divr 2.0 r23
+addr r23 r22
+move z r24
+divr 4.0 r24
+addr r24 r22
+move z r25
+divr 5.0 r25
+addr r25 r22
+move z r26
+divr 6.0 r26
+addr r26 r22
+move z r27
+divr 7.0 r27
+addr r27 r22
+move r22 t
+sys writer t
+sys halt

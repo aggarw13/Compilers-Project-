@@ -7,7 +7,6 @@ class Micro
 {
 	public static void main (String[] args) throws Exception
 	{
-		System.out.println("Arguments to file\n" + args);
 		ANTLRFileStream data = null;
 		try
 		{
@@ -28,13 +27,27 @@ class Micro
 		try
 		{
 			parser.program();
-			System.out.println("Starts creating AST!");
 			//SemanticDataHandler.printSemanticStack(SemanticDataHandler.globalScope);
 			for(ASTNode root : ASTStackHandler.getASTFIFO())
 			{
 				ASTStackHandler.traverseTree(root);
-				System.out.print("\n");
+			}		
+
+			generateTinyCode.allocateMemory();
+			for(IRNode instr : generateIR.IRCodeList)
+			{
+				System.out.print(";");
+				instr.printIR();
+				generateTinyCode.createCode(instr);
 			}
+
+			System.out.println(";Tiny Code");
+			for(TinyCode instr : generateTinyCode.CodeList)
+			{
+				instr.printInstr();
+			}
+			System.out.println("sys halt");
+			//System.out.println("Number of Tiny instructions :" + generateTinyCode.CodeList.size());
 
 			//ParseTreeWalker walker = new ParseTreeWalker();
 			//SemanticDataBuilder semanticStack = new SemanticDataBuilder(parser);						

@@ -63,7 +63,9 @@ import java.lang.Exception.*;
 
 	public Symbol getRecord(String recName)
 	{
-		return semanticRecords.get(recName);
+		Symbol record =  semanticRecords.get(recName);
+		//System.out.print("Exits extraction for symbol + "+record);
+		return record;
 	}	
 
 	public void printTable()

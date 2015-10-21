@@ -12,11 +12,12 @@
  		{
  			this.OPname = name;
  		}
-/*
- 		public String name()
- 		{
- 			return this.OPname;
- 		}*/
+
+ 		public static boolean checkPriority(OPERATION op1, OPERATION op2)
+ 		{	
+ 			return !((op1 == ADD || op1 == SUB) && (op2 == MULT || op2 == DIV));
+ 		}
+
 	}	
 
 	

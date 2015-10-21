@@ -34,21 +34,21 @@ base_stmt         : assign_stmt | read_stmt | write_stmt | return_stmt;
 
 /* Basic Statements */
 assign_stmt       : assign_expr ';';
-assign_expr       : id ':=' {ASTStackHandler.pushAssignmentTree(SemanticDataHandler.currentScope, $id.text);} expr {ASTStackHandler.updateCurrTree();} ;
+assign_expr       : id { ASTStackHandler.addTermNode(ASTNodeType.IDENTIFIER, $id.text);} ':=' {ASTStackHandler.pushAssignmentTree(SemanticDataHandler.currentScope);} expr {ASTStackHandler.updateCurrTree();} ;
 read_stmt         : 'READ' '(' id_list ')' {ASTStackHandler.pushIOTree(IO_TYPE.READ, $id_list.text, SemanticDataHandler.currentScope);} ';';
 write_stmt        : 'WRITE' '(' id_list ')' {ASTStackHandler.pushIOTree(IO_TYPE.WRITE, $id_list.text, SemanticDataHandler.currentScope);} ';';
 return_stmt       : 'RETURN' expr ';';
 
 /* Expressions */		
 expr              : expr_prefix factor;
-expr_prefix       : expr_prefix factor addop {ASTStackHandler.createArithmeticTree($addop.text);} | ;
+expr_prefix       : expr_prefix factor addop {ASTStackHandler.createArithmeticTree($addop.text); ASTStackHandler.subExprStack.push("+");} | ;
 factor            : factor_prefix postfix_expr;
-factor_prefix     : factor_prefix postfix_expr mulop {ASTStackHandler.createArithmeticTree($mulop.text);} | ;
-postfix_expr      : primary | call_expr;
+factor_prefix     : factor_prefix postfix_expr mulop {ASTStackHandler.createArithmeticTree($mulop.text); ASTStackHandler.subExprStack.push("*"); /*ASTStackHandler.SubTreeBlockEnded = false;*/} | ;
+postfix_expr      : primary {ASTStackHandler.SubTreeBlock = false;}| call_expr;
 call_expr         : id '(' expr_list ')';
 expr_list         : expr expr_list_tail | ;
 expr_list_tail    : ',' expr expr_list_tail | ;
-primary           : '(' expr ')' {ASTStackHandler.updateCurrSubTree();} | id {ASTStackHandler.addTermNode(ASTNodeType.IDENTIFIER, $id.text);ASTStackHandler.updateCurrSubTree(); } | INTLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $INTLITERAL.text);ASTStackHandler.updateCurrSubTree();} | FLOATLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $FLOATLITERAL.text); ASTStackHandler.updateCurrSubTree();};
+primary           : {/*ASTStackHandler.SubTreeBlock = true; ASTStackHandler.SubTreeBlockEnded = false;*/ ASTStackHandler.subExprStack.push("(");} '(' expr  {/*ASTStackHandler.SubTreeBlock = false; ASTStackHandler.SubTreeBlockEnded = true;*/}  ')' {ASTStackHandler.subExprStack.push(")"); ASTStackHandler.updateCurrSubTree();} | id {ASTStackHandler.addTermNode(ASTNodeType.IDENTIFIER, $id.text); ASTStackHandler.updateCurrSubTree();} | INTLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $INTLITERAL.text); ASTStackHandler.updateCurrSubTree();} | FLOATLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $FLOATLITERAL.text); ASTStackHandler.updateCurrSubTree();};
 addop             : '+' | '-';
 mulop             : '*' | '/';
 

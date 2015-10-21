@@ -12,7 +12,8 @@ class DataObject
 	public enum TYPE
 	{
 		L,
-		R
+		R,
+		CONSTANT
 	}
 
 	private TYPE valType;

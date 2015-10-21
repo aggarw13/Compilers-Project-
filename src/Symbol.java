@@ -14,13 +14,15 @@ public class Symbol
 
 	public Symbol(String symName, String symType)
 	{
+		//if(symName == "a")
+					//System.out.println("Type of Variable 'A' record : "+symName+" "+symType+" "+(symType.equals("INT")));
 		this.name = symName;
-		if(symType == "STRING")
+		if(symType.equals("STRING"))
 			this.Type = VARTYPE.STRING;
-		else if(symType == "FLOAT")
+		else if(symType.equals("FLOAT"))
 			this.Type = VARTYPE.FLOAT;
-		else if(symType == "INT")
-			this.Type = VARTYPE.INT;
+		else if(symType.equals("INT")){
+			this.Type = VARTYPE.INT;}
 	}
 
 	public String getName()
@@ -30,12 +32,18 @@ public class Symbol
 
 	public VARTYPE getType()
 	{
+		//System.out.println("Record type : "+this.Type.name());
 		return this.Type;		
 	}
 
 	public void setVal(String value)
 	{
 		this.value = value;
+	}
+
+	public String getVal(String value)
+	{
+		return this.value;
 	}
 
 	public void displayRecord()
