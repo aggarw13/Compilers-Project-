@@ -1,12 +1,14 @@
 #! /bin/bash
-make compiler
+#make compiler
 
-if [ $1 == 1 ]
-then
-	make test4 TESTARGS='step4_testcase3'
-else
-	make test4 TESTARGS='test_expr'
-fi
+make test5 TESTARGS=$1 
+
+#if [ $1 == 1 ]
+#then
+#	make test5 TESTARGS='step4_testcase'
+#else
+#	make test5 TESTARGS='test_if'
+#fi
 
 
 #make test3 TESTARGS='test1'

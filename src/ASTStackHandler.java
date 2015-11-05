@@ -18,9 +18,16 @@ import java.lang.Exception.*;
 public class ASTStackHandler
 {
 	public static ASTNode first = null, last = null;
-	public static List<ASTNode> ASTStack = new ArrayList<ASTNode>(); 
+	public static List<ASTNode> ASTStack = new ArrayList<ASTNode>();
+
     public static  Stack<ASTNode> SubTreeStack = new Stack<ASTNode>();
     public static Stack<String> subExprStack = new Stack<String>();
+    public static Stack<ASTNode> structStack= new Stack<ASTNode>();
+    public static Stack<ASTNode> FORincrStack = new Stack<ASTNode>();
+    public static ASTNode currStructure = null;    
+    public static ASTNode condLeft = null, condRight = null;
+    public static ASTNode currFORTree = null;
+    //public static List<ASTNode> currList = n;
 
     public static boolean SubTreeBlock = false;
     public static boolean priorityOperatorTree = false;
@@ -83,9 +90,143 @@ public class ASTStackHandler
         }    
     }
 
+    /**************************FOR Loop Structure Methods ************************************/
+    public static void pushFORStructure(ASTNodeType type, SymbolTable scope)
+    {
+        ASTNode newRoot = new ASTNode(type, null, scope);
+        if(ASTStackHandler.first == null && type == ASTNodeType.FOR)
+            ASTStackHandler.first = newRoot;
+        boolean optimize = false;
+        if(ASTStackHandler.structStack.size() > 0 && (ASTStackHandler.structStack.peek().getType() == ASTNodeType.FI
+             || ASTStackHandler.structStack.peek().getType() == ASTNodeType.ROF)){
+             optimize = ASTStackHandler.last.getType() == ASTNodeType.FI || ASTStackHandler.last.getType() == ASTNodeType.ROF;}
+        int labelNum = optimize? ASTStackHandler.structStack.peek().getLabel() : generateIR.labelNumber++;
+        if(optimize)
+            ASTStackHandler.structStack.pop().setLabel(-1);
+        else if(ASTStackHandler.structStack.size() > 0 && ASTStackHandler.structStack.peek().getType() != ASTNodeType.FOR_INCR)
+            ASTStackHandler.structStack.pop();    
+        if(type == ASTNodeType.ROF)
+        { 
+            ASTNode incrNode = ASTStackHandler.structStack.pop();
+            incrNode.setLabel(labelNum);
+            newRoot.setLabel(generateIR.labelNumber++);
+            incrNode.getParent().setJumpLabel(generateIR.labelNumber - 1);
+                  }
+        else
+            newRoot.setLabel(labelNum); 
+
+             //ASTStackHandler.structStack.pop().setLabel(-1);
+        //else 
+          // newRoot.setLabel(generateIR.labelNumber++);
+
+        //System.out.println("Enters FOR node creation Sized of stack : " + ASTStackHandler.structStack.size());
+        //if(type == ASTNodeType.ROF){
+           //System.out.println("Stack Top Node Type on ROF encounter : "+ASTStackHandler.structStack.peek().getType().name());
+           /*if(ASTStackHandler.structStack.peek().getType() == ASTNodeType.FOR){
+            ASTStackHandler.structStack.peek().setJumpLabel(newRoot.getLabel());
+            newRoot.setJumpLabel(ASTStackHandler.structStack.pop().getLabel());     
+        }*/
+        //else if(ASTStackHandler.structStack.peek().getType() == ASTNodeType.FOR_INCR)
+        //{
+           //newRoot.setJumpLabel(ASTStackHandler.structStack.pop().getJumpLabel());                 
+        //}
+       //}
+            //newRoot.setJumpLabel(ASTStackHandler.structStack.pop().getLabel());
+        ASTStackHandler.ASTStack.add(newRoot);
+        ASTStackHandler.structStack.add(newRoot);
+        System.out.println("Stack Top Node Type on ROF/FOR encounter : "+newRoot.getType().name());
+        ASTStackHandler.last = newRoot;
+    }
+
+    /*********************************** IF ELSE structure AST methods*****************************/
+    public static void pushIFELSEStructureTree(ASTNodeType type, SymbolTable scope)
+    {
+        //System.out.println("Enters IF ELSE node generation for :"+type.name());
+        ASTNode newRoot = new ASTNode(type, null, scope);
+        if(ASTStackHandler.first == null && type == ASTNodeType.IF)
+            ASTStackHandler.first = newRoot;
+        ASTStackHandler.ASTStack.add(newRoot);
+        if(type == ASTNodeType.IF)
+        { 
+            if(ASTStackHandler.structStack.size() > 0 && (ASTStackHandler.structStack.peek().getType() == ASTNodeType.FI 
+                || ASTStackHandler.structStack.peek().getType() == ASTNodeType.ROF))
+                ASTStackHandler.structStack.pop();
+            //newRoot.setJumpLabel(generateIR.labelNumber++);
+        }
+        else if(type == ASTNodeType.FI || type == ASTNodeType.ELSE)
+        {
+            //Label for the else structure
+            if(type == ASTNodeType.FI && (ASTStackHandler.structStack.peek().getType() == ASTNodeType.FI || ASTStackHandler.structStack.peek().getType() == ASTNodeType.ROF))
+            {
+                newRoot.setLabel(ASTStackHandler.structStack.peek().getLabel());
+                ASTStackHandler.structStack.pop().setLabel(-1);
+            }
+            else 
+            {
+                if(ASTStackHandler.structStack.peek().getType() != ASTNodeType.IF && type == ASTNodeType.ELSE)
+                    ASTStackHandler.structStack.pop();
+                newRoot.setLabel(generateIR.labelNumber++);
+            }
+            //System.out.println("Stack Node being popped "+ ASTStackHandler.structStack.peek().getType().name());
+
+            ASTStackHandler.structStack.pop().setJumpLabel(newRoot.getLabel());
+        }
+        ASTStackHandler.structStack.add(newRoot); 
+        //System.out.println("Stack Node just pushed "+ ASTStackHandler.structStack.peek().getType().name());
+        ASTStackHandler.last = newRoot;
+        //System.out.println("Exits IF ELSE node generation");
+    }
+
+    public static void setCondExpr(String dir, String compOp)
+    {   
+        ASTNode expr = null;
+        if(!dir.equals("c"))
+        {
+            if(ASTStackHandler.SubTreeStack.size() == 0)
+                expr = ASTStackHandler.currTermNode;
+            else 
+                expr = ASTStackHandler.SubTreeStack.pop();
+        }
+        if(dir.equals("l"))
+            ASTStackHandler.condLeft = expr;
+        if(dir.equals("c"))
+        {
+            OPERATION oper;
+            //System.out.println("Parsed compare operator : "+compOp.length());
+            switch(compOp.toCharArray()[0])
+            {
+                case '=' : oper = OPERATION.EQ; break;
+                case '!' : oper = OPERATION.NE; break;
+                case '>' : if(compOp.length() > 1 /*&& compOp.toCharArray()[1] == '=')*/) {oper = OPERATION.GE;} else {oper = OPERATION.GT; }break;
+                case '<' : if(compOp.length() > 1) {oper = OPERATION.LE; } else {oper = OPERATION.LT;} break;
+                default : oper = OPERATION.NE;
+            }
+            ASTNode condRoot = new ASTNode(ASTNodeType.COMPOP, compOp, null);
+            condRoot.setLeftChild(ASTStackHandler.condLeft);
+            condRoot.setParentStructure(ASTStackHandler.structStack.peek());
+            /*if(condRoot.getParent().getType() == ASTNodeType.FOR)
+            {   
+                System.out.println("Enters COND expr Stack Push");
+                condRoot.setLabel(ASTStackHandler.structStack.pop().getLabel());
+                ASTStackHandler.structStack.add(condRoot);
+            }*/
+            condRoot.setOperation(oper);
+
+             //System.out.println("Enters FOR TEST expr tree creation");
+            ASTStackHandler.ASTStack.add(condRoot);
+            ASTStackHandler.last = condRoot;
+        }
+
+        if(dir.equals("r"))
+            ASTStackHandler.last.setRightChild(expr);
+
+        //System.out.println("EXITS FOR TEST expr tree creation");
+    }
+
+    /***********************************Assignment tree and Expression tree methods*********************/
     public static void pushAssignmentTree(SymbolTable treeScope)
     {
-    	ASTNode newRoot = new ASTNode(ASTNodeType.ASSIGNMENT, null, treeScope);
+    	ASTNode newRoot = new ASTNode(ASTNodeType.ASSIGNMENT, "=", treeScope);
     	
     	// Initialize first pointer to FIFO
     	if(ASTStackHandler.first == null)
@@ -96,6 +237,29 @@ public class ASTStackHandler
     	newRoot.setLeftChild(ASTStackHandler.currTermNode);
     	last = newRoot;
         //newRoot.setDataObject();
+    }
+
+    public static void changeNodeType(ASTNodeType newType, boolean dummy)
+    {
+        if(newType == ASTNodeType.FOR_INCR && !dummy)
+        {
+            ASTStackHandler.last.setType(newType);
+            ASTStackHandler.last.setJumpLabel(ASTStackHandler.structStack.peek().getLabel());
+            ASTStackHandler.last.setParentStructure(ASTStackHandler.structStack.pop());
+            //System.out.println("Enters here for FOR INCR stack push" + ASTStackHandler.last.getParent().getType().name());
+            ASTStackHandler.structStack.add(ASTStackHandler.last);
+            //System.out.println("Enters INCR node type change!");
+        }
+        else if(newType == ASTNodeType.FOR_INCR)
+        {
+            ASTNode dummyINCR = new ASTNode(ASTNodeType.FOR_INCR, null, null);
+            ASTStackHandler.ASTStack.add(dummyINCR);
+            dummyINCR.setJumpLabel(ASTStackHandler.structStack.peek().getLabel());
+            dummyINCR.setParentStructure(ASTStackHandler.structStack.pop());
+            ASTStackHandler.structStack.push(dummyINCR);
+        }
+        //if(newType == ASTNodeType.FOR_INIT)
+        //    ASTStackHandler.last.setLabel(ASTStackHandler.structStack.peek().getLabel());
     }
 
     public static void pushIOTree(IO_TYPE ioOp, String id_list, SymbolTable treeScope)
@@ -145,7 +309,7 @@ public class ASTStackHandler
             //System.out.println("Creates a new EXPR TREE with base node " + mathOp + " and left child "+ currTermNode.getNameValue());
         }      
 
-        //Case when Top is Stack is Left Child of Parent Root Node  (Push Root Node to Staxck after poppig Left SUb Tree)
+        //Case when Top is Stack is Left Child of Parent Root Node  (Push Root Node to Stack after poppig Left SUb Tree)
         else if(ASTStackHandler.SubTreeStack.peek().getRightChild() != null)
         {
             //if(OPERATION.checkPriority(ASTStackHandler.SubTreeStack.peek().getOperation(), oper) && !ASTStackHandler.SubTreeBlock || ASTStackHandler.SubTreeBlockEnded)
@@ -185,7 +349,8 @@ public class ASTStackHandler
             boolean foundRecord = false;
             idScope = SemanticDataHandler.findRecordScope(name_value, SemanticDataHandler.currentScope);
             if(idScope == null)
-                {System.out.println("EXPRESSION Error : Identifier not declared!");System.exit(0);}
+                {System.out.println("EXPRESSION Error : Identifier not declared!");
+                System.exit(0);}
 
         }
         ASTNode litNode = new ASTNode(leafASTNodeType, name_value, idScope);
@@ -195,6 +360,12 @@ public class ASTStackHandler
     //In Order Traversal of tree
     public static void traverseTree(ASTNode root)
     {
+        if(root.getType() == ASTNodeType.COMPOP && root.getParent().getLabel() != -1)
+            generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, Integer.toString(root.getParent().getLabel()));
+
+        if(root.getType() == ASTNodeType.FOR_INCR)
+            generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, Integer.toString(root.getLabel()));
+
         if(root.getLeftChild() != null){
             //if(root.getLeftChild().getType() != ASTNodeType.IDENTIFIER || root.getLeftChild().getType() != ASTNodeType.LITERAL)
             //System.out.print("(");
@@ -209,7 +380,7 @@ public class ASTStackHandler
         ASTStackHandler.traverseTree(root.getRightChild());
         //if(root.getRightChild().getType() != ASTNodeType.IDENTIFIER || root.getRightChild().getType() != ASTNodeType.LITERAL)
         //System.out.print(")");
-    }
+        }
         root.generateIRCode(); 
     }
 

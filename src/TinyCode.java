@@ -14,7 +14,8 @@ import java.lang.Exception.*;
  	{
  		MOVE,
  		ALU,
- 		JUMP,
+ 		CMP,
+ 		JMP,
  		IO,
  		LABEL,
  		STACK,
@@ -34,13 +35,26 @@ import java.lang.Exception.*;
  		DIVR,
  		INCI,
  		DECI,
- 		CMPI,
- 		CMPR
+  	}
+
+ 	public enum OPCODE_JUMP
+ 	{
+ 		JMP,
+ 		JGT,
+ 		JLT,
+ 		JLE,
+ 		JGE,
+ 		JNE,
+ 		JEQ,
+ 		CMPR,
+ 		CMPI
  	}
+
  	public enum OPCODE_IO
  	{	
  		READI,
  		READR,
+ 		READS,
  		WRITEI,
  		WRITER,
  		WRITES
@@ -49,6 +63,7 @@ import java.lang.Exception.*;
  	public INSTR_TYPE instr_type;
  	public OPCODE_ARITH op_arith;
  	public OPCODE_IO op_io;
+ 	public OPCODE_JUMP op_jmp;
 
 	public String target = null;
 	public String operand1 = null, dest = null, imm = null;
@@ -78,6 +93,11 @@ import java.lang.Exception.*;
 		this.op_io = opcode;
 	}
 
+	public void setJmpOp(TinyCode.OPCODE_JUMP opcode)
+	{
+		this.op_jmp = opcode;
+	}
+
 	public void setStrVal(String value)
 	{
 		this.strValue = value;
@@ -96,7 +116,12 @@ import java.lang.Exception.*;
 			System.out.println(this.op_arith.name().toLowerCase() + " "+ src+" "+this.dest);
 		else if(this.instr_type == TinyCode.INSTR_TYPE.IO)
 			System.out.println("sys "+this.op_io.name().toLowerCase() +" "+this.dest);
-			
+		else if(this.instr_type == TinyCode.INSTR_TYPE.CMP)
+			System.out.println(this.op_jmp.name().toLowerCase() + " " +  src + " " + this.dest);
+		else if(this.instr_type == TinyCode.INSTR_TYPE.JMP)
+			System.out.println(this.op_jmp.name().toLowerCase() + " label"+ this.target);
+		else if(this.instr_type == TinyCode.INSTR_TYPE.LABEL)
+			System.out.println("label label"+ this.target);
 	}
 	public void setTarget(String target)
 	{

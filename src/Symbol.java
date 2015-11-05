@@ -41,7 +41,7 @@ public class Symbol
 		this.value = value;
 	}
 
-	public String getVal(String value)
+	public String getVal()
 	{
 		return this.value;
 	}

@@ -32,8 +32,10 @@ import java.lang.Exception.*;
  		LABEL("LABEL"),
  		READI("READI"),
  		READF("READF"),
+ 		READS("READS"),
  		WRITEI("WRITEI"),
- 		WRITEF("WRITEF");
+ 		WRITEF("WRITEF"),
+ 		WRITES("WRITES");
 
  		private final String  OPname;
 
@@ -50,6 +52,7 @@ import java.lang.Exception.*;
 	public String labelTarget;
 	public String operand1, operand2, dest;
 	public String imm1, imm2;
+	public VARTYPE cmprType = VARTYPE.INT;
 	public IRNode(IRNode.OPCODE opcode, String op1, String op2,String result)
 	{
 		this.opcode = opcode;
@@ -60,15 +63,13 @@ import java.lang.Exception.*;
 
 	public void printIR()
 	{
-		/*if(this.opcode == STOREI || this.opcode == STOREF)
-			System.out.print(this.opcode.name() + " " + this.result);
-		else if(this.opcode.name() == STOREI || this.opcode.name() == STOREF)*/
 		String src1 = (this.operand1 != null)? (generateTinyCode.checkifInt(this.operand1)? "$T" + this.operand1 : this.operand1) : this.imm1;
 		String src2 = (this.operand2 != null)? (generateTinyCode.checkifInt(this.operand2)? "$T" + this.operand2 : this.operand2) : this.imm2;
 		String dest = this.dest;
-		if(generateTinyCode.checkifInt(dest))
+		if(this.dest == null && this.labelTarget != null)
+			dest = "label" + this.labelTarget;
+		else if(generateTinyCode.checkifInt(dest))
 			dest = "$T" + dest;
-
 		if(src2 == null && src1 == null)
 			System.out.println(this.opcode.name() + " " + dest);
 		else if(src2 == null)

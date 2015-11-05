@@ -4,7 +4,13 @@
 		ADD("ADD"),
 		SUB("SUB"),
 		MULT("MULT"),
-		DIV("DIV");
+		DIV("DIV"),
+		LT("LE"),
+		GT("GT"),
+		LE("LE"),
+		GE("GE"),
+		NE("NE"),
+		EQ("EQ");
 
 		private final String OPname;
 

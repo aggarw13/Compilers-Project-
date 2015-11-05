@@ -53,15 +53,15 @@ addop             : '+' | '-';
 mulop             : '*' | '/';
 
 /* Complex Statements and Condition */ 
-if_stmt           : 'IF' {SemanticDataHandler.pushNewScope(SCOPE.BLOCK, null);}'(' cond ')' decl  {SemanticDataHandler.popCurrentScope();} stmt_list else_part 'FI';
-else_part         : 'ELSE' {SemanticDataHandler.pushNewScope(SCOPE.BLOCK, null);} decl  stmt_list {SemanticDataHandler.popCurrentScope();}| ;
-cond              : expr compop expr;
+if_stmt           : 'IF' {SemanticDataHandler.pushNewScope(SCOPE.BLOCK, null); ASTStackHandler.pushIFELSEStructureTree(ASTNodeType.IF, SemanticDataHandler.currentScope);}'(' cond ')' decl  {SemanticDataHandler.popCurrentScope();} stmt_list else_part 'FI' {ASTStackHandler.pushIFELSEStructureTree(ASTNodeType.FI, null);};
+else_part         : 'ELSE' {SemanticDataHandler.pushNewScope(SCOPE.BLOCK, null); ASTStackHandler.pushIFELSEStructureTree(ASTNodeType.ELSE, SemanticDataHandler.currentScope);} decl  stmt_list {SemanticDataHandler.popCurrentScope();}| ;
+cond              : expr {ASTStackHandler.setCondExpr("l", null);} compop {ASTStackHandler.setCondExpr("c", $compop.text);} expr {ASTStackHandler.setCondExpr("r", null);}; 
 compop            : '<' | '>' | '=' | '!=' | '<=' | '>=';
 
-init_stmt         : assign_expr | ;
-incr_stmt         : assign_expr | ;
+init_stmt         : assign_expr {/* System.out.println("Completes INIT "); */ ASTStackHandler.changeNodeType(ASTNodeType.FOR_INIT, false);} | ;
+incr_stmt         : assign_expr {/* System.out.println("Completes INCR"); */ ASTStackHandler.changeNodeType(ASTNodeType.FOR_INCR, false);} | {ASTStackHandler.changeNodeType(ASTNodeType.FOR_INCR, true);} ;
 /* ECE 468 students use this version of for_stmt */
-for_stmt          : 'FOR' {SemanticDataHandler.pushNewScope(SCOPE.BLOCK, null);} '('init_stmt ';' cond ';' incr_stmt ')' decl /*{SemanticDataHandler.displayCurrentScope();}*/ stmt_list {SemanticDataHandler.popCurrentScope();} 'ROF';
+for_stmt          : 'FOR' {SemanticDataHandler.pushNewScope(SCOPE.BLOCK, null); ASTStackHandler.pushFORStructure(ASTNodeType.FOR, SemanticDataHandler.currentScope); /*System.out.println("Starts expr tree creations!")*/;} '('init_stmt ';' cond ';' incr_stmt ')' { /*System.out.println("Finishes exprs tress creation!");*/} decl  stmt_list {SemanticDataHandler.popCurrentScope();} 'ROF' {ASTStackHandler.pushFORStructure(ASTNodeType.ROF, SemanticDataHandler.currentScope); System.out.println("Completes ROF");};
 
 /************************************Micro language lexer rules********************************************************/
 fragment DIGIT : ('0'..'9');

@@ -7,13 +7,13 @@ import org.antlr.v4.runtime.*;
 import java.io.*;
 import java.util.*;
 
-
 class ASTNode
 {
-	private String id_value;
+	private String id_value = null;
 	private SymbolTable scopeTable;
 	private ASTNode leftNode = null, rightNode = null;
 	private ASTNode parent = null;
+	private int label = -1, jumpLabel = -1;
 	private DataObject nodeData = new DataObject();
 	private ASTNodeProp nodeInfo;
 
@@ -25,6 +25,36 @@ class ASTNode
 		this.scopeTable = scope;
 		this.setDataObject();
 	}
+
+	public void setParentStructure(ASTNode node)
+	{
+		this.parent = node;
+	}
+
+	public ASTNode getParent()
+	{
+		return this.parent;
+	}
+
+	public void setLabel(int label)
+	{
+		this.label = label;
+	}
+
+	public int getLabel()
+	{
+		return this.label;
+	}	
+
+	public void setJumpLabel(int label)
+	{
+		this.jumpLabel = label;
+	}
+
+	public int getJumpLabel()
+	{
+		return this.jumpLabel;
+	}	
 
 	public String getNameValue()
 	{
@@ -44,6 +74,11 @@ class ASTNode
 	public ASTNodeType getType()
 	{
 		return this.nodeInfo.type;
+	}
+
+	public void setType(ASTNodeType type)
+	{
+		this.nodeInfo.type = type;
 	}
 
 	public void setIOType(IO_TYPE io_op)
@@ -117,8 +152,28 @@ class ASTNode
 								this.nodeData.setDataType(VARTYPE.INT);
 							break;
 			case IO : for(String id : this.leftNode.getNameValue().split(",")){
-						generateIR.IOop(this.nodeInfo.ioOp, id, SemanticDataHandler.findRecordScope(id, scopeTable));}
-		}					  		
+						generateIR.IOop(this.nodeInfo.ioOp, id, SemanticDataHandler.findRecordScope(id, scopeTable));} break;
+			case COMPOP : code = generateIR.compOp(this.nodeInfo.operator, this.leftNode.getDataObject(), this.rightNode.getDataObject()); 
+  						  //System.out.println("Jump Label for COMPOP FOR : "+this.jumpLabel);
+  						  code.setTarget(Integer.toString(this.getParent().getJumpLabel()));
+						  break;
+			case ELSE : generateIR.jumpLabelIR(IRNode.OPCODE.JUMP,Integer.toString(this.jumpLabel));
+						generateIR.jumpLabelIR(IRNode.OPCODE.LABEL,Integer.toString(this.label));
+						break;
+			case FI :  	if(this.label != -1)
+						generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, Integer.toString(this.label)); break;
+			//case FOR : generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, Integer.toString(this.label)); break; 
+			case FOR_INCR : if(this.id_value != null)
+								code = generateIR.assignmentOp(this.leftNode.getDataObject(), this.rightNode.getDataObject()); 
+							generateIR.jumpLabelIR(IRNode.OPCODE.JUMP, Integer.toString(this.jumpLabel));	
+							break;
+			case FOR_INIT : code = generateIR.assignmentOp(this.leftNode.getDataObject(), this.rightNode.getDataObject()); 
+							//generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, Integer.toString(this.label));	
+							break;
+			case ROF : 	//generateIR.jumpLabelIR(IRNode.OPCODE.JUMP, Integer.toString(this.jumpLabel));
+						if(this.label != -1)
+							generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, Integer.toString(this.label));
+		}
 	}
 
 	public void setDataObject()
@@ -138,13 +193,13 @@ class ASTNode
 			//System.out.println("Enters Literal");
 			if(this.id_value.indexOf('.') != -1)
 				this.nodeData.setDataType(VARTYPE.FLOAT);
-			else
+			else 
 				this.nodeData.setDataType(VARTYPE.INT);
 			this.nodeData.setType(DataObject.TYPE.CONSTANT);
 			this.nodeData.setDest(this.id_value);
 			//System.out.print("Exits Literal");
 		}
-		else if(this.nodeInfo.type == ASTNodeType.OPERATOR)
+		else if(this.nodeInfo.type == ASTNodeType.OPERATOR || this.nodeInfo.type == ASTNodeType.COMPOP)
 		{
 			//System.out.println("Enters Operator object creation");
 			this.nodeData.setType(DataObject.TYPE.R);	

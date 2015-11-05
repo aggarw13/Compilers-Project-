@@ -18,7 +18,7 @@ class Micro
 		}
 		catch(FileNotFoundException ex) 
 		{
-         	System.err.println("Invalid micro fil0e!");
+         	System.err.println("Invalid micro file!");
 		}	        
 		MicroLexer lexer = new MicroLexer(data);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -29,9 +29,21 @@ class Micro
 			parser.program();
 			//SemanticDataHandler.printSemanticStack(SemanticDataHandler.globalScope);
 			for(ASTNode root : ASTStackHandler.getASTFIFO())
-			{
+			{			
+		        if(root.getType() == ASTNodeType.FOR_INCR)
+		        {
+		            ASTStackHandler.FORincrStack.add(root);
+		        	continue;
+		        }
+		        else if(root.getType() == ASTNodeType.ROF && ASTStackHandler.FORincrStack.size() > 0)
+		        {
+		        	//System.out.println("Enters here for priting ROF! size : "+ASTStackHandler.FORincrStack.size());
+		            ASTStackHandler.traverseTree(ASTStackHandler.FORincrStack.pop());
+		        }
 				ASTStackHandler.traverseTree(root);
 			}		
+
+			System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
 
 			generateTinyCode.allocateMemory();
 			for(IRNode instr : generateIR.IRCodeList)
@@ -41,16 +53,12 @@ class Micro
 				generateTinyCode.createCode(instr);
 			}
 
-			System.out.println(";Tiny Code");
+			//System.out.println(";Tiny Code");
 			for(TinyCode instr : generateTinyCode.CodeList)
 			{
 				instr.printInstr();
 			}
-			System.out.println("sys halt");
-			//System.out.println("Number of Tiny instructions :" + generateTinyCode.CodeList.size());
-
-			//ParseTreeWalker walker = new ParseTreeWalker();
-			//SemanticDataBuilder semanticStack = new SemanticDataBuilder(parser);						
+			System.out.println("sys halt");						
 		}
 		catch(Exception e)
 		{

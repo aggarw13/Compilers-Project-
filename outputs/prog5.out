@@ -1,0 +1,52 @@
+;READF num
+;STOREI 1 j
+;STOREF num $T1
+;STOREF $T1 approx
+;STOREI 100 i
+;LABEL label1
+;STOREI 0 $T2
+;EQ i $T2 label3
+;DIVF num approx $T3
+;ADDF approx $T3 $T4
+;MULTF 0.5 $T4 $T5
+;STOREF $T5 newapprox
+;STOREF newapprox $T6
+;STOREF $T6 approx
+;LABEL label2
+;SUBI i 1 $T7
+;STOREI $T7 i
+;JUMP label1
+;LABEL label3
+;WRITEF approx
+;WRITES eol
+var i
+var j
+var newapprox
+var approx
+var num
+str eol "\n"
+sys readr num
+move 1 j
+move num r1
+move r1 approx
+move 100 i
+label label1
+move 0 r2
+cmpi i r2
+jeq label3
+move num r3
+divr approx r3
+addr approx r3
+mulr 0.5 r3
+move r3 newapprox
+move newapprox r4
+move r4 approx
+label label2
+move i r5
+subi 1 r5
+move r5 i
+jmp label1
+label label3
+sys writer approx
+sys writes eol
+sys halt

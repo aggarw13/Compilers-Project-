@@ -34,7 +34,6 @@ class generateTinyCode
 	{
 		SymbolTable scope = SemanticDataHandler.globalScope;
 		Symbol record; 
-		//String name;
 		for(String name : scope.getRecords())
 		{	
 			record = scope.getRecord(name);
@@ -50,7 +49,7 @@ class generateTinyCode
 
 				case STRING:
 				TinyCode instr = new TinyCode(TinyCode.INSTR_TYPE.STR, record.getName(), null ,null); 
-				instr.setStrVal(record.getName());
+				instr.setStrVal(record.getVal());
 				generateTinyCode.CodeList.add(instr);
 			}
 		}
@@ -62,6 +61,7 @@ class generateTinyCode
 		TinyCode.INSTR_TYPE instr_type = TinyCode.INSTR_TYPE.MOVE;
 		TinyCode.OPCODE_ARITH op_arith = TinyCode.OPCODE_ARITH.ADDI;
 		TinyCode.OPCODE_IO op_io = TinyCode.OPCODE_IO.READI;
+		TinyCode.OPCODE_JUMP op_jmp = TinyCode.OPCODE_JUMP.JMP;
 		String dest = null, op1 = null, target = null;
 		switch(node.opcode)
 		{ 
@@ -77,8 +77,18 @@ class generateTinyCode
 			case STOREF : instr_type = TinyCode.INSTR_TYPE.MOVE; break;
 			case READI :  instr_type = TinyCode.INSTR_TYPE.IO;  op_io = TinyCode.OPCODE_IO.READI; break;
 			case READF :  instr_type = TinyCode.INSTR_TYPE.IO;  op_io = TinyCode.OPCODE_IO.READR; break;
+			case READS : instr_type = TinyCode.INSTR_TYPE.IO;  op_io = TinyCode.OPCODE_IO.READS; break;
 			case WRITEI : instr_type = TinyCode.INSTR_TYPE.IO;  op_io = TinyCode.OPCODE_IO.WRITEI; break;
-			case WRITEF : instr_type = TinyCode.INSTR_TYPE.IO;  op_io = TinyCode.OPCODE_IO.WRITER; 
+			case WRITES : instr_type = TinyCode.INSTR_TYPE.IO;   op_io = TinyCode.OPCODE_IO.WRITES; break;
+			case WRITEF : instr_type = TinyCode.INSTR_TYPE.IO;  op_io = TinyCode.OPCODE_IO.WRITER; break;
+			case JUMP : instr_type = TinyCode.INSTR_TYPE.JMP; op_jmp = TinyCode.OPCODE_JUMP.JMP; break;
+			case GE : instr_type = TinyCode.INSTR_TYPE.JMP; op_jmp = TinyCode.OPCODE_JUMP.JGE; break;
+			case EQ : instr_type = TinyCode.INSTR_TYPE.JMP; op_jmp = TinyCode.OPCODE_JUMP.JEQ; break;
+			case NE : instr_type = TinyCode.INSTR_TYPE.JMP; op_jmp = TinyCode.OPCODE_JUMP.JNE; break;
+			case LE : instr_type = TinyCode.INSTR_TYPE.JMP; op_jmp = TinyCode.OPCODE_JUMP.JLE; break;
+			case LT : instr_type = TinyCode.INSTR_TYPE.JMP; op_jmp = TinyCode.OPCODE_JUMP.JLT; break;
+			case GT : instr_type = TinyCode.INSTR_TYPE.JMP; op_jmp = TinyCode.OPCODE_JUMP.JGT; break; 
+			case LABEL : instr_type = TinyCode.INSTR_TYPE.LABEL; 
 		}
 
 		//System.out.println("instr type : "+instr_type.name());
@@ -165,7 +175,7 @@ class generateTinyCode
 						op1 = generateTinyCode.IRTempMap.get(op1);
 				}
 
-				if(!generateTinyCode.IRTempMap.containsKey(node.operand1) && (node.opcode == IRNode.OPCODE.DIVF || node.opcode == IRNode.OPCODE.DIVF)){
+				if(!generateTinyCode.IRTempMap.containsKey(node.operand1) && (node.opcode == IRNode.OPCODE.DIVF || node.opcode == IRNode.OPCODE.SUBF)){
 					dest = Integer.toString(generateTinyCode.tempNumber++);
 					generateTinyCode.IRTempMap.put(node.dest, Integer.toString(generateTinyCode.tempNumber - 1));
 				}
@@ -181,6 +191,30 @@ class generateTinyCode
 			//Check if destination is temp register or memory address 
 			instr = new TinyCode(instr_type, null, node.dest, null);
 			instr.setIOOp(op_io);
+			generateTinyCode.CodeList.add(instr);
+		}
+
+		else if(instr_type == TinyCode.INSTR_TYPE.LABEL)
+		{
+			instr = new TinyCode(instr_type, null, node.dest, null);
+			instr.setTarget(node.labelTarget);
+			generateTinyCode.CodeList.add(instr);
+		}
+		else if(instr_type == TinyCode.INSTR_TYPE.JMP)
+		{
+			op1 = (node.operand1 != null)? (generateTinyCode.IRTempMap.containsKey(node.operand1)? generateTinyCode.IRTempMap.get(node.operand1) : node.operand1 ): node.imm1;
+			if(op_jmp != TinyCode.OPCODE_JUMP.JMP)
+			{
+				TinyCode.OPCODE_JUMP cmp_type = TinyCode.OPCODE_JUMP.CMPR;
+				if(node.cmprType == VARTYPE.INT)
+					cmp_type = TinyCode.OPCODE_JUMP.CMPI;
+				instr = new TinyCode(TinyCode.INSTR_TYPE.CMP, op1, generateTinyCode.IRTempMap.get(node.operand2), null);		
+				instr.setJmpOp(cmp_type);
+				generateTinyCode.CodeList.add(instr);
+			}
+			instr = new TinyCode(instr_type, null, node.dest, null);
+			instr.setJmpOp(op_jmp);
+			instr.setTarget(node.labelTarget);
 			generateTinyCode.CodeList.add(instr);
 		}
 	}

@@ -29,6 +29,9 @@ test3:
 test4: compiler
 	 java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step4/input/$(TESTARGS).micro 
 
+test5 : compiler
+	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step5/EE468/input/$(TESTARGS).micro 
+
 clean:
 	rm -rf classes build
 

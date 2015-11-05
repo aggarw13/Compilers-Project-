@@ -1,0 +1,3 @@
+rm -rf build
+mkdir build
+java -cp lib/antlr.jar org.antlr.v4.Tool -o build Micro.g4
