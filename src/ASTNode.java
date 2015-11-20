@@ -14,6 +14,7 @@ class ASTNode
 	private ASTNode leftNode = null, rightNode = null;
 	private ASTNode parent = null;
 	private int label = -1, jumpLabel = -1;
+	private List<String> params = new List<String>();
 	private DataObject nodeData = new DataObject();
 	private ASTNodeProp nodeInfo;
 
@@ -34,6 +35,11 @@ class ASTNode
 	public ASTNode getParent()
 	{
 		return this.parent;
+	}
+
+	public void addParam(String param)
+	{
+		this.params.add(param);
 	}
 
 	public void setLabel(int label)
@@ -173,6 +179,15 @@ class ASTNode
 			case ROF : 	//generateIR.jumpLabelIR(IRNode.OPCODE.JUMP, Integer.toString(this.jumpLabel));
 						if(this.label != -1)
 							generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, Integer.toString(this.label));
+						break;
+			case FUNC_CALL_BEGIN : generateIR.functionCall(this.id_value, params);
+							  break;
+			case RETURN : generateIR.returnOp(this.rightNode);
+							break;
+			case FUNC_BEGIN : generateIR.jumpLabelIR(IRNode.LABEL, this.id_value);
+							  generateIR.funcScope(this.getType());
+							  break;
+			case  FUNC_END : generateIR.funcScope(this.getType()); 
 		}
 	}
 

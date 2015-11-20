@@ -35,7 +35,13 @@ import java.lang.Exception.*;
  		READS("READS"),
  		WRITEI("WRITEI"),
  		WRITEF("WRITEF"),
- 		WRITES("WRITES");
+ 		WRITES("WRITES"),
+ 		LNK("LNK"),
+ 		UNLNK("UNLNK"),
+ 		PUSH("PUSH"),
+ 		POP("POP"),
+ 		RET("RET"),
+ 		JSR("JSR");
 
  		private final String  OPname;
 
@@ -70,10 +76,14 @@ import java.lang.Exception.*;
 			dest = "label" + this.labelTarget;
 		else if(generateTinyCode.checkifInt(dest))
 			dest = "$T" + dest;
-		if(src2 == null && src1 == null)
+		if(src2 == null && src1 == null && dest != null)
 			System.out.println(this.opcode.name() + " " + dest);
-		else if(src2 == null)
+		else if(src != null && src2 == null && dest != null)
 			System.out.println(this.opcode.name() + " " + src1 + " " + dest);
+		else if(src2 == null && dest == null)
+			System.out.println(this.opcode.name() + " " + src1);
+		else if(src1 == null && src2 ==  null && dest != null)
+			System.out.println(this.opcode.name() + " " + dest);
 		else 	
 			System.out.println(this.opcode.name() + " " + src1 + " " + src2 + " " + dest);
 	}

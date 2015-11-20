@@ -13,7 +13,8 @@ class DataObject
 	{
 		L,
 		R,
-		CONSTANT
+		CONSTANT,
+		FUNC_CALL
 	}
 
 	private TYPE valType;

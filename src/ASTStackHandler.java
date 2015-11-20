@@ -20,11 +20,11 @@ public class ASTStackHandler
 	public static ASTNode first = null, last = null;
 	public static List<ASTNode> ASTStack = new ArrayList<ASTNode>();
 
-    public static  Stack<ASTNode> SubTreeStack = new Stack<ASTNode>();
+    public static Stack<ASTNode> SubTreeStack = new Stack<ASTNode>();
     public static Stack<String> subExprStack = new Stack<String>();
     public static Stack<ASTNode> structStack = new Stack<ASTNode>();
     public static Stack<ASTNode> FORincrStack = new Stack<ASTNode>();
-    public static List<Function> functionList = new List<Function>(); 
+    public static List<Function> functionList = new ArrayList<Function>(); 
 
     public static ASTNode currStructure = null;    
     public static ASTNode condLeft = null, condRight = null;
@@ -46,19 +46,24 @@ public class ASTStackHandler
         return ASTStackHandler.ASTStack;
     }
 
-    public static addFuntion(String func_name)
-    {   
+    /****************************************Function Scope and Call Handling Methods******************************/
+
+    public static addFuntion(String func_name, String retType)
+    {  
         Function func;
         func = new Function(func_name, SemanticDataHandler.currentScope));
         ASTStackHandler.functionList.add(func);
+        func.setReturnType(type);
         ASTSTackHandler.currFunct = func;
+        ASTNode funcNode = new ASTNodeType(ASTNodeType.FUNC_BEGIN, func_name, null);
+        funcNode.setLabel(func_name);
+        ASTSTackHandler.ASTStack.add(funcNode);
     }
 
     public static updateFunctionScope(String name, SCOPE type)
     {
         if(ASTStackHandler.currFunct != null)
         {
-
             if(type == SCOPE.LOCAL)
                 ASTStackHandler.currFunct.addLocalVar(name);
             else if(type == SCOPE.PARAM)
@@ -66,12 +71,30 @@ public class ASTStackHandler
         }
     }
 
-
-    public static void pushFunctionCall(String funcName)
+    public static void pushFunctionCall(String funcName, ASTNodeType callType)
     {
-
+        ASTNode funcCall = new ASTNode(callType, funcName, null);
+        ASTSTackHandler.ASTSTack.add(funcCall);
     }
 
+    public static void pushFuncParamNode()
+    {
+        if(ASTStackHandler.SubTreeStack.size() == 0)
+            ASTStackHandler.ASTStack.add(ASTStackHandler.currTermNode);
+        else
+            ASTStackHandler.ASTStack.add(ASTStackHandler.subTreeStack.pop());
+    }
+
+    public static void addFuncInfoNode(ASTNodeType type)
+    {
+        ASTSTackHandler.ASTStack.add(new ASTNode(type, null, null));
+        if(type == ASTNodeType.RETURN)
+        {
+            ASTStackHandler.updateCurrTree();    
+        }
+    }
+    
+    /*****************************************Expression AST Creation Methods*********************************************/
 
     public static void updateCurrTree()
     {
@@ -141,7 +164,7 @@ public class ASTStackHandler
             incrNode.setLabel(labelNum);
             newRoot.setLabel(generateIR.labelNumber++);
             incrNode.getParent().setJumpLabel(generateIR.labelNumber - 1);
-                  }
+        }
         else
             newRoot.setLabel(labelNum); 
 

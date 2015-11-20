@@ -27,9 +27,11 @@ class Micro
 		try
 		{
 			parser.program();
+			ASTNode root;
 			//SemanticDataHandler.printSemanticStack(SemanticDataHandler.globalScope);
-			for(ASTNode root : ASTStackHandler.getASTFIFO())
+			for(Iterator<String> it = ASTStackHandler.getASTFIFO().iterator() ; it.hasNext();)
 			{			
+				root = it.next();
 		        if(root.getType() == ASTNodeType.FOR_INCR)
 		        {
 		            ASTStackHandler.FORincrStack.add(root);
@@ -40,12 +42,26 @@ class Micro
 		        	//System.out.println("Enters here for priting ROF! size : "+ASTStackHandler.FORincrStack.size());
 		            ASTStackHandler.traverseTree(ASTStackHandler.FORincrStack.pop());
 		        }
+		        else if(root.getType() == ASTNodeType.FUNC_BEGIN)
+		        {
+		        	ASTStackHandler.currFunct == ASTSTackHandler.functionList.get(ASTStackHandler.functionList.getIndexOf(root.getNameValue()));
+		        }
+		        else if(root.getType() == ASTNodeType.FUNC_CALL_BEGIN)
+		        {
+		        	ASTNode paramNode = it.next();
+		        	while(paramNode.getType() != ASTNodeType.FUNC_CALL_END)
+		    		{
+		    			ASTStackHandler.traverseTree(paramNode);
+		    			root.addParam(paramNode.getDataObject().getDest());
+		    			paramNode = it.next();
+		    		}
+		        }
 				ASTStackHandler.traverseTree(root);
 			}		
 
 			//System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
 
-			generateTinyCode.allocateMemory();
+			/*generateTinyCode.allocateMemory();
 			for(IRNode instr : generateIR.IRCodeList)
 			{
 				System.out.print(";");
@@ -58,7 +74,7 @@ class Micro
 			{
 				instr.printInstr();
 			}
-			System.out.println("sys halt");						
+			System.out.println("sys halt");	*/					
 		}
 		catch(Exception e)
 		{

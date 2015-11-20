@@ -9,7 +9,8 @@ import java.lang.Exception.*;
  {
 
  	public static int tempNumber = 1;
- 	public static int labelNumber = 1;
+ 	//public static int labelNumber = 1;
+ 	//public static String 
 
  	public static List<IRNode> IRCodeList = new ArrayList<IRNode>();
 
@@ -21,6 +22,46 @@ import java.lang.Exception.*;
  		node.setTarget(labelNo);
  		generateIR.IRCodeList.add(node);
  		//return node;
+  	}
+
+  	public static funcScope(ASTNodeType type)
+  	{
+  		if(type == ASTNodeType.FUNC_BEGIN)
+  			generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.LNK, null,null,null, null);
+  		else if(type == ASTNode.FUNC_END)
+  		{
+  			generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.UNLNK, null, null, null, null));
+  			generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.RET, null, null, null, null));
+  		}
+  	}
+
+  	public static void returnOp(DataObject rightNode)
+  	{
+  		IRNode.OPCODE op = IRNode.OPCODE.STOREI;
+  		if(ASTStackHandler.currFunct.returnType == VARTYPE.FLOAT)
+  			op = IRNode.OPCODE.STOREF;
+  		String op1 = rightNode.getDest(), imm = null;
+  		if(rightNode.getValueType() == DataObject.TYPE.CONSTANT)
+  		{
+  			 imm = op1; op1 = null;
+  		}
+		IRNode node = new IRNode(op, op1, null, "$R");
+		node.setImm1(imm);	
+		generateIR.IRCodeList.add(node);
+  	}
+
+  	public static void functionCall(String funcName, String[] params)
+  	{
+  		generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.PUSH, null, null, null, null, null));
+		for(String params : params)
+		{
+			generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.PUSH, param, null, null, null, null));
+		}  		
+		generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.JSR, funcName, null, null, null));
+		for(String params : params)
+		{
+			generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.POP, null, null, null, null, null));
+		} 	
   	}
 
  	public static IRNode compOp(OPERATION operator, DataObject left, DataObject right)
@@ -130,6 +171,12 @@ import java.lang.Exception.*;
  		IRNode assgnNode;
  		if(Lnode.getDataType() == VARTYPE.FLOAT && Rnode.getDataType() == VARTYPE.FLOAT)
  			assgnOP = IRNode.OPCODE.STOREF;
+
+ 		if(Rnode.DataObject.TYPE == DataObject.FUNC_CALL)
+ 		{
+ 			generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.POP, null, null, Integer.toString(generateIR.tempNumber++)));
+ 			ASTStackHandler.currFunct.incTempCount();
+ 		}
  		 
  		if(/*Rnode.getValueType() == DataObject.TYPE.CONSTANT || */Rnode.getValueType() == DataObject.TYPE.L)
  		{
@@ -144,8 +191,10 @@ import java.lang.Exception.*;
  		assgnNode = new IRNode(assgnOP, null, null, Lnode.getDest());
  		if(Rnode.getValueType() == DataObject.TYPE.CONSTANT)
  			assgnNode.setImm1(Rnode.getDest());
- 		else
+ 		else if(Rnode.getValueType() == DataObject.TYPE.L)
  			assgnNode.operand1 = Rnode.getDest();
+ 		else
+ 			assgnNode.operand1 = generateIR.tempNumber - 1;
  		generateIR.IRCodeList.add(assgnNode);
  		//System.out.println("EXITS Assignment Code generation");
  		//assgnNode.printIR();
