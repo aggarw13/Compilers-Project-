@@ -13,5 +13,6 @@
 		FOR_INIT,
 		FOR_TEST,
 		FOR_INCR,
-		ROF
+		ROF,
+		FUNC_CALL
 	}

@@ -6,5 +6,5 @@ public enum VARTYPE
 {
 	INT,
 	FLOAT,
-	STRING
+	STRING,
 }

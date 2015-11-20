@@ -2275,7 +2275,7 @@ public class MicroParser extends Parser {
 			setState(346); stmt_list();
 			SemanticDataHandler.popCurrentScope();
 			setState(348); match(2);
-			ASTStackHandler.pushFORStructure(ASTNodeType.ROF, SemanticDataHandler.currentScope); System.out.println("Completes ROF");
+			ASTStackHandler.pushFORStructure(ASTNodeType.ROF, SemanticDataHandler.currentScope); /*System.out.println("Completes ROF");*/
 			}
 		}
 		catch (RecognitionException re) {

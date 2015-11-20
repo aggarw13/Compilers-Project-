@@ -43,7 +43,7 @@ class Micro
 				ASTStackHandler.traverseTree(root);
 			}		
 
-			System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
+			//System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
 
 			generateTinyCode.allocateMemory();
 			for(IRNode instr : generateIR.IRCodeList)

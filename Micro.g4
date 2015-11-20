@@ -11,7 +11,7 @@ string_decl       : 'STRING' id ':=' str ';'  {SemanticDataHandler.addScopeRecor
 str               : STRINGLITERAL;
 
 /* Variable Declaration */
-var_decl          : var_type id_list ';' {SemanticDataHandler.addScopeRecord($id_list.text, $var_type.text);} ;
+var_decl          : var_type id_list ';' {SemanticDataHandler.addScopeRecord($id_list.text, $var_type.text);   ASTStackHandler.updateFunctionScope($id_list.text, SCOPE.GLOBAL); } ;
 any_type          : var_type | 'VOID';
 var_type	      : 'FLOAT'| 'INT';
 id_list           : id id_tail;
@@ -19,12 +19,12 @@ id_tail           : ',' id id_tail | ;
 
 /* Function Paramater List */
 param_decl_list   : param_decl param_decl_tail | ;
-param_decl        : var_type id {SemanticDataHandler.addScopeRecord($id.text, $var_type.text);} ;
+param_decl        : var_type id {SemanticDataHandler.addScopeRecord($id.text, $var_type.text);  ASTStackHandler.updateFunctionScope($id.text, SCOPE.PARAM);} ;
 param_decl_tail   : ',' param_decl param_decl_tail | ;
 
 /* Function Declarations */
 func_declarations : func_decl func_declarations | ;
-func_decl         : 'FUNCTION' any_type id {SemanticDataHandler.pushNewScope(SCOPE.FUNCTION, $id.text);} '('param_decl_list')' 'BEGIN' func_body 'END' {SemanticDataHandler.popCurrentScope();} ;
+func_decl         : 'FUNCTION' any_type id {SemanticDataHandler.pushNewScope(SCOPE.FUNCTION, $id.text); ASTStackHandler.addFunction($id.text);} '('param_decl_list')' 'BEGIN' func_body 'END' {SemanticDataHandler.popCurrentScope();} ;
 func_body         : decl stmt_list ;
 
 /* Statement List */
@@ -45,8 +45,8 @@ expr_prefix       : expr_prefix factor addop {ASTStackHandler.createArithmeticTr
 factor            : factor_prefix postfix_expr;
 factor_prefix     : factor_prefix postfix_expr mulop {ASTStackHandler.createArithmeticTree($mulop.text); ASTStackHandler.subExprStack.push("*"); /*ASTStackHandler.SubTreeBlockEnded = false;*/} | ;
 postfix_expr      : primary {ASTStackHandler.SubTreeBlock = false;}| call_expr;
-call_expr         : id '(' expr_list ')';
-expr_list         : expr expr_list_tail | ;
+call_expr         : id {ASTStackHandler.pushFunctionCall($id.text) '(' expr_list ')' {ASTSTackHandler.endFunctionCall();} ;
+expr_list         : expr {ASTStackHandler.pushExprSubTree();} expr_list_tail | ;
 expr_list_tail    : ',' expr expr_list_tail | ;
 primary           : {/*ASTStackHandler.SubTreeBlock = true; ASTStackHandler.SubTreeBlockEnded = false;*/ ASTStackHandler.subExprStack.push("(");} '(' expr  {/*ASTStackHandler.SubTreeBlock = false; ASTStackHandler.SubTreeBlockEnded = true;*/}  ')' {ASTStackHandler.subExprStack.push(")"); ASTStackHandler.updateCurrSubTree();} | id {ASTStackHandler.addTermNode(ASTNodeType.IDENTIFIER, $id.text); ASTStackHandler.updateCurrSubTree();} | INTLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $INTLITERAL.text); ASTStackHandler.updateCurrSubTree();} | FLOATLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $FLOATLITERAL.text); ASTStackHandler.updateCurrSubTree();};
 addop             : '+' | '-';
@@ -61,7 +61,7 @@ compop            : '<' | '>' | '=' | '!=' | '<=' | '>=';
 init_stmt         : assign_expr {/* System.out.println("Completes INIT "); */ ASTStackHandler.changeNodeType(ASTNodeType.FOR_INIT, false);} | ;
 incr_stmt         : assign_expr {/* System.out.println("Completes INCR"); */ ASTStackHandler.changeNodeType(ASTNodeType.FOR_INCR, false);} | {ASTStackHandler.changeNodeType(ASTNodeType.FOR_INCR, true);} ;
 /* ECE 468 students use this version of for_stmt */
-for_stmt          : 'FOR' {SemanticDataHandler.pushNewScope(SCOPE.BLOCK, null); ASTStackHandler.pushFORStructure(ASTNodeType.FOR, SemanticDataHandler.currentScope); /*System.out.println("Starts expr tree creations!")*/;} '('init_stmt ';' cond ';' incr_stmt ')' { /*System.out.println("Finishes exprs tress creation!");*/} decl  stmt_list {SemanticDataHandler.popCurrentScope();} 'ROF' {ASTStackHandler.pushFORStructure(ASTNodeType.ROF, SemanticDataHandler.currentScope); System.out.println("Completes ROF");};
+for_stmt          : 'FOR' {SemanticDataHandler.pushNewScope(SCOPE.BLOCK, null); ASTStackHandler.pushFORStructure(ASTNodeType.FOR, SemanticDataHandler.currentScope); /*System.out.println("Starts expr tree creations!")*/;} '('init_stmt ';' cond ';' incr_stmt ')' { /*System.out.println("Finishes exprs tress creation!");*/} decl  stmt_list {SemanticDataHandler.popCurrentScope();} 'ROF' {ASTStackHandler.pushFORStructure(ASTNodeType.ROF, SemanticDataHandler.currentScope); /*System.out.println("Completes ROF");*/};
 
 /************************************Micro language lexer rules********************************************************/
 fragment DIGIT : ('0'..'9');

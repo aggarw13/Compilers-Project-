@@ -91,6 +91,7 @@ import java.lang.Exception.*;
  	{
  		IRNode.OPCODE opcode = IRNode.OPCODE.ADDI;
  		IRNode opNode;
+ 		String temp_dest;
  		short resType = 0;
  		String imm1 = null, imm2 = null, op1 = left.getDest(), op2 = right.getDest();
  		//System.out.println("Enters Generate Arithmetic Code");
@@ -112,7 +113,8 @@ import java.lang.Exception.*;
  			{imm2 = right.getDest(); op2 = null;}
 
 		opNode = new IRNode(opcode, op1, op2, Integer.toString(generateIR.tempNumber++)); 
- 		opNode.setImm1(imm1);
+		ASTStackHandler.currFunct.incTempCount();
+	 	opNode.setImm1(imm1);
  		opNode.setImm2(imm2);
 
 		//System.out.println("Number of instructions in IR List :" + generateIR.IRCodeList.size());

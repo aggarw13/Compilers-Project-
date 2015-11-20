@@ -22,14 +22,17 @@ public class ASTStackHandler
 
     public static  Stack<ASTNode> SubTreeStack = new Stack<ASTNode>();
     public static Stack<String> subExprStack = new Stack<String>();
-    public static Stack<ASTNode> structStack= new Stack<ASTNode>();
+    public static Stack<ASTNode> structStack = new Stack<ASTNode>();
     public static Stack<ASTNode> FORincrStack = new Stack<ASTNode>();
+    public static List<Function> functionList = new List<Function>(); 
+
     public static ASTNode currStructure = null;    
     public static ASTNode condLeft = null, condRight = null;
     public static ASTNode currFORTree = null;
     //public static List<ASTNode> currList = n;
+    public static Function currFunct = null;
 
-    public static boolean SubTreeBlock = false;
+    public static booelan SubTreeBlock = false;
     public static boolean priorityOperatorTree = false;
     public static boolean SubTreeBlockEnded = false;
 
@@ -42,6 +45,33 @@ public class ASTStackHandler
     {
         return ASTStackHandler.ASTStack;
     }
+
+    public static addFuntion(String func_name)
+    {   
+        Function func;
+        func = new Function(func_name, SemanticDataHandler.currentScope));
+        ASTStackHandler.functionList.add(func);
+        ASTSTackHandler.currFunct = func;
+    }
+
+    public static updateFunctionScope(String name, SCOPE type)
+    {
+        if(ASTStackHandler.currFunct != null)
+        {
+
+            if(type == SCOPE.LOCAL)
+                ASTStackHandler.currFunct.addLocalVar(name);
+            else if(type == SCOPE.PARAM)
+                ASTStackHandler.currFunct.addParamVar(name);        
+        }
+    }
+
+
+    public static void pushFunctionCall(String funcName)
+    {
+
+    }
+
 
     public static void updateCurrTree()
     {
@@ -134,7 +164,7 @@ public class ASTStackHandler
             //newRoot.setJumpLabel(ASTStackHandler.structStack.pop().getLabel());
         ASTStackHandler.ASTStack.add(newRoot);
         ASTStackHandler.structStack.add(newRoot);
-        System.out.println("Stack Top Node Type on ROF/FOR encounter : "+newRoot.getType().name());
+        //System.out.println("Stack Top Node Type on ROF/FOR encounter : "+newRoot.getType().name());
         ASTStackHandler.last = newRoot;
     }
 

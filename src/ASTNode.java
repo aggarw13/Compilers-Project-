@@ -181,7 +181,15 @@ class ASTNode
 		if(this.nodeInfo.type == ASTNodeType.IDENTIFIER)
 		{
 			//System.out.println("Enters IDentifier : "+this.getType().name());
-			this.nodeData.setDest(this.id_value);
+			if(ASTStackHandler.currFunct != null)
+			{
+				if(ASTStackHandler.currFunct.localMap.containsKey(this.id_value))
+					this.nodeData.setDest("L" + ASTStackHandler.currFunct.localMap.get(this.id_value));
+				else if(ASTStackHandler.currFunct.paramMap.containsKey(this.id_value))
+					this.nodeData.setDest("P" + ASTStackHandler.currFunct.paramMap.get(this.id_value));
+			}
+			else
+				this.nodeData.setDest(this.id_value);
 			//System.out.println("")
 			this.nodeData.setType(DataObject.TYPE.L);
 			if(scopeTable != null)
