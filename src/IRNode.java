@@ -36,7 +36,7 @@ import java.lang.Exception.*;
  		WRITEI("WRITEI"),
  		WRITEF("WRITEF"),
  		WRITES("WRITES"),
- 		LNK("LNK"),
+ 		LINK("LINK"),
  		UNLNK("UNLNK"),
  		PUSH("PUSH"),
  		POP("POP"),
@@ -73,18 +73,23 @@ import java.lang.Exception.*;
 		String src2 = (this.operand2 != null)? (generateTinyCode.checkifInt(this.operand2)? "$T" + this.operand2 : this.operand2) : this.imm2;
 		String dest = this.dest;
 		if(this.dest == null && this.labelTarget != null)
-			dest = "label" + this.labelTarget;
-		else if(generateTinyCode.checkifInt(dest))
+		{
+			dest = this.labelTarget;
+			if(generateTinyCode.checkifInt(this.labelTarget))
+				dest = "label" + this.labelTarget;
+		}
+		else 
+			if(generateTinyCode.checkifInt(dest))
 			dest = "$T" + dest;
 		if(src2 == null && src1 == null && dest != null)
 			System.out.println(this.opcode.name() + " " + dest);
-		else if(src != null && src2 == null && dest != null)
+		else if(src1 != null && src2 == null && dest != null)
 			System.out.println(this.opcode.name() + " " + src1 + " " + dest);
-		else if(src2 == null && dest == null)
+		else if(src2 == null && dest == null && src1 != null)
 			System.out.println(this.opcode.name() + " " + src1);
-		else if(src1 == null && src2 ==  null && dest != null)
-			System.out.println(this.opcode.name() + " " + dest);
-		else 	
+		else if(src2 == null && src1 == null && dest == null)
+			System.out.println(this.opcode.name());
+		else 
 			System.out.println(this.opcode.name() + " " + src1 + " " + src2 + " " + dest);
 	}
 

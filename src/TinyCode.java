@@ -22,7 +22,7 @@ import java.lang.Exception.*;
  		HALT,
  		VAR,
  		STR
- 	}
+  	}
 
  	public enum OPCODE_ARITH{
  		ADDI,
@@ -47,7 +47,8 @@ import java.lang.Exception.*;
  		JNE,
  		JEQ,
  		CMPR,
- 		CMPI
+ 		CMPI,
+ 		JSR
  	}
 
  	public enum OPCODE_IO
@@ -60,27 +61,48 @@ import java.lang.Exception.*;
  		WRITES
  	}
 
+ 	public enum OPCODE_STACK
+ 	{
+ 		PUSH,
+ 		POP,
+ 		LINK,
+ 		UNLINK,
+ 		RET
+ 	}
+
  	public INSTR_TYPE instr_type;
  	public OPCODE_ARITH op_arith;
  	public OPCODE_IO op_io;
  	public OPCODE_JUMP op_jmp;
+ 	public OPCODE_STACK op_stack;
 
 	public String target = null;
 	public String operand1 = null, dest = null, imm = null;
-	public String strValue;
+	public String strValue = null;
+	public int linkCount = 0;
 
 	public TinyCode(TinyCode.INSTR_TYPE opcode, String op1, String dest, String imm)
 	{
 		this.instr_type = opcode;
-		if(generateTinyCode.checkifInt(op1))
-			this.operand1 = "r" + op1;
-		else
-			this.operand1 = op1;
-		if(generateTinyCode.checkifInt(dest))
-			this.dest = "r" + dest;
-		else
-			this.dest= dest;
+		this.operand1 = this.setSrcDest(op1);
+		this.dest = this.setSrcDest(dest);
 		this.imm = imm;
+	}
+
+	private String setSrcDest(String id)
+	{
+		String updated_id = id;
+		if(generateTinyCode.checkifInt(id))
+			 updated_id = "r" + id;
+		else if(id != null && id.length() > 2)
+		{
+			if(id.substring(0,2).equals("$L"))
+				updated_id = "$-" + id.substring(2);
+			else if(id.substring(0,2).equals("$P"))
+				updated_id = "$" + (5 + Integer.valueOf(id.substring(2))); 
+		}
+		//System.out.println(id.substring(0,2).equals("$L"));
+		return updated_id;
 	}
 
 	public void setArithOp(TinyCode.OPCODE_ARITH opcode)
@@ -98,14 +120,27 @@ import java.lang.Exception.*;
 		this.op_jmp = opcode;
 	}
 
+	public void setStackOp(TinyCode.OPCODE_STACK opcode)
+	{
+		this.op_stack = opcode;
+	}
+
 	public void setStrVal(String value)
 	{
 		this.strValue = value;
+	}
+
+	public void setLinkCount(int count)
+	{
+		this.linkCount = count;
 	}
 	public void printInstr()
 	{
 		//System.out.println("Tiny Instruction Type :"+this.instr_type.name());
 		String src = (this.operand1 != null)? this.operand1 : this.imm;
+		String target = this.target;
+		if(generateTinyCode.checkifInt(target))
+			target = "label" + target;
 		if(this.instr_type == TinyCode.INSTR_TYPE.VAR)
 			System.out.println("var "+this.operand1);
 		else if(this.instr_type == TinyCode.INSTR_TYPE.STR)
@@ -119,9 +154,20 @@ import java.lang.Exception.*;
 		else if(this.instr_type == TinyCode.INSTR_TYPE.CMP)
 			System.out.println(this.op_jmp.name().toLowerCase() + " " +  src + " " + this.dest);
 		else if(this.instr_type == TinyCode.INSTR_TYPE.JMP)
-			System.out.println(this.op_jmp.name().toLowerCase() + " label"+ this.target);
+			System.out.println(this.op_jmp.name().toLowerCase() + target);
 		else if(this.instr_type == TinyCode.INSTR_TYPE.LABEL)
-			System.out.println("label label"+ this.target);
+			System.out.println("label "+ target);
+		else if(this.instr_type == TinyCode.INSTR_TYPE.STACK)
+		{	
+			if(op_stack == TinyCode.OPCODE_STACK.LINK)
+				System.out.println("LINK "+this.linkCount);
+			else if(this.operand1 != null)
+				System.out.println(this.op_stack.name() + " " + this.operand1);
+			else
+				System.out.println(this.op_stack.name());
+		}
+		else if(this.instr_type == TinyCode.INSTR_TYPE.HALT)
+			System.out.println("sys halt");
 	}
 	public void setTarget(String target)
 	{

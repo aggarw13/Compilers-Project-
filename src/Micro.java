@@ -28,10 +28,14 @@ class Micro
 		{
 			parser.program();
 			ASTNode root;
+			short func_index = -1;
 			//SemanticDataHandler.printSemanticStack(SemanticDataHandler.globalScope);
-			for(Iterator<String> it = ASTStackHandler.getASTFIFO().iterator() ; it.hasNext();)
-			{			
+			//System.out.println("Parsed Functions detected "+ ASTStackHandler.functionList.size());
+			for(Iterator<ASTNode> it = ASTStackHandler.getASTFIFO().iterator() ; it.hasNext();)
+			{	
 				root = it.next();
+				//System.out.println("Currently generating code for "+root.getNameValue());
+				
 		        if(root.getType() == ASTNodeType.FOR_INCR)
 		        {
 		            ASTStackHandler.FORincrStack.add(root);
@@ -44,28 +48,46 @@ class Micro
 		        }
 		        else if(root.getType() == ASTNodeType.FUNC_BEGIN)
 		        {
-		        	ASTStackHandler.currFunct == ASTSTackHandler.functionList.get(ASTStackHandler.functionList.getIndexOf(root.getNameValue()));
+		        	func_index++;
+		        	generateIR.tempNumber = 0;
+		        	ASTStackHandler.currFunct = ASTStackHandler.functionList.get(func_index);
+		        	//ASTStackHandler.currFunct = ASTStackHandler.functionList.get(ASTStackHandler.functionList.indexOf(root.getNameValue()));
 		        }
-		        else if(root.getType() == ASTNodeType.FUNC_CALL_BEGIN)
+		        //TODO : Needs to be changed to accommodate Subexpression Function Calls
+		        else if(root.getType() == ASTNodeType.ASSIGNMENT && root.getRightChild().getType() == ASTNodeType.TEMP_VAR)
 		        {
-		        	ASTNode paramNode = it.next();
-		        	while(paramNode.getType() != ASTNodeType.FUNC_CALL_END)
-		    		{
-		    			ASTStackHandler.traverseTree(paramNode);
-		    			root.addParam(paramNode.getDataObject().getDest());
-		    			paramNode = it.next();
-		    		}
-		        }
+		        	ASTNode assignNode = root;
+		        	root = it.next();
+			        if(root.getType() == ASTNodeType.FUNC_CALL_BEGIN)
+			        {
+			        	ASTNode paramNode = it.next();
+			        	while(paramNode.getType() != ASTNodeType.FUNC_CALL_END)
+			    		{
+			    			ASTStackHandler.traverseTree(paramNode);
+			    			root.addParam(paramNode.getDataObject().getDest());
+			    			paramNode = it.next();
+			    		}
+			        }
+			        ASTStackHandler.traverseTree(root);
+			       	root = assignNode;
+			    }
 				ASTStackHandler.traverseTree(root);
 			}		
 
-			//System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
+			System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
 
-			/*generateTinyCode.allocateMemory();
+			generateTinyCode.allocateMemory();
+			generateTinyCode.mainJumpCode();
+			func_index = -1;
 			for(IRNode instr : generateIR.IRCodeList)
 			{
 				System.out.print(";");
 				instr.printIR();
+				if(instr.opcode == IRNode.OPCODE.LINK)
+				{
+					ASTStackHandler.currFunct = ASTStackHandler.functionList.get(++func_index);
+					generateTinyCode.IRTempMap = new HashMap<String,String>();
+				}
 				generateTinyCode.createCode(instr);
 			}
 
@@ -74,7 +96,7 @@ class Micro
 			{
 				instr.printInstr();
 			}
-			System.out.println("sys halt");	*/					
+			
 		}
 		catch(Exception e)
 		{

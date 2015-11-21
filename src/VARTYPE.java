@@ -7,4 +7,6 @@ public enum VARTYPE
 	INT,
 	FLOAT,
 	STRING,
+	VOID,
+	INV
 }

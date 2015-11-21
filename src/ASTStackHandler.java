@@ -32,7 +32,7 @@ public class ASTStackHandler
     //public static List<ASTNode> currList = n;
     public static Function currFunct = null;
 
-    public static booelan SubTreeBlock = false;
+    public static boolean SubTreeBlock = false;
     public static boolean priorityOperatorTree = false;
     public static boolean SubTreeBlockEnded = false;
 
@@ -48,19 +48,18 @@ public class ASTStackHandler
 
     /****************************************Function Scope and Call Handling Methods******************************/
 
-    public static addFuntion(String func_name, String retType)
+    public static void addFunction(String func_name)
     {  
         Function func;
-        func = new Function(func_name, SemanticDataHandler.currentScope));
+        func = new Function(func_name, SemanticDataHandler.currentScope);
         ASTStackHandler.functionList.add(func);
-        func.setReturnType(type);
-        ASTSTackHandler.currFunct = func;
-        ASTNode funcNode = new ASTNodeType(ASTNodeType.FUNC_BEGIN, func_name, null);
-        funcNode.setLabel(func_name);
-        ASTSTackHandler.ASTStack.add(funcNode);
+        ASTStackHandler.currFunct = func;
+        ASTNode funcNode = new ASTNode(ASTNodeType.FUNC_BEGIN, func_name, null);
+        ASTStackHandler.ASTStack.add(funcNode);
+        ASTStackHandler.last = funcNode;
     }
 
-    public static updateFunctionScope(String name, SCOPE type)
+    public static void updateFunctionScope(String name, SCOPE type)
     {
         if(ASTStackHandler.currFunct != null)
         {
@@ -74,7 +73,13 @@ public class ASTStackHandler
     public static void pushFunctionCall(String funcName, ASTNodeType callType)
     {
         ASTNode funcCall = new ASTNode(callType, funcName, null);
-        ASTSTackHandler.ASTSTack.add(funcCall);
+        ASTStackHandler.ASTStack.add(funcCall);
+        //ASTStackHandler.last = funcCall;
+        if(callType == ASTNodeType.FUNC_CALL_END)
+        {
+            ASTStackHandler.currTermNode = new ASTNode(ASTNodeType.TEMP_VAR, null, null);
+            System.out.println("Size of Sub Tree Stack "+ ASTStackHandler.SubTreeStack.size());
+        }
     }
 
     public static void pushFuncParamNode()
@@ -82,25 +87,39 @@ public class ASTStackHandler
         if(ASTStackHandler.SubTreeStack.size() == 0)
             ASTStackHandler.ASTStack.add(ASTStackHandler.currTermNode);
         else
-            ASTStackHandler.ASTStack.add(ASTStackHandler.subTreeStack.pop());
+            ASTStackHandler.ASTStack.add(ASTStackHandler.SubTreeStack.pop());
     }
 
     public static void addFuncInfoNode(ASTNodeType type)
     {
-        ASTSTackHandler.ASTStack.add(new ASTNode(type, null, null));
+        ASTNode node = new ASTNode(type, null, null);
+        ASTStackHandler.last = node;
+        ASTStackHandler.ASTStack.add(node);
         if(type == ASTNodeType.RETURN)
         {
             ASTStackHandler.updateCurrTree();    
         }
     }
     
+    public static void setFuncRetType(String type)
+    {
+        if(ASTStackHandler.currFunct != null && ASTStackHandler.currFunct.returnType == VARTYPE.INV)
+        {
+            ASTStackHandler.currFunct.setReturnType(type);
+        }
+    }
+
     /*****************************************Expression AST Creation Methods*********************************************/
 
     public static void updateCurrTree()
     {
          //ASTNode rightChild = (ASTStackHandler.SubTreeStack.size() > 0)? ASTStackHandler.currTermNode : ASTStackHandler.SubTreeStack.pop();
         if(ASTStackHandler.SubTreeStack.size() == 0)
+        {
+            if(ASTStackHandler.last.getType() != ASTNodeType.RETURN)
+                System.out.println("Left Child of Assignment Tree " + ASTStackHandler.last.getLeftChild());
             ASTStackHandler.last.setRightChild(ASTStackHandler.currTermNode);
+        }
         else
             ASTStackHandler.last.setRightChild(ASTStackHandler.SubTreeStack.pop());
     }
@@ -419,13 +438,18 @@ public class ASTStackHandler
         if(root.getType() == ASTNodeType.FOR_INCR)
             generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, Integer.toString(root.getLabel()));
 
+        if(root.getType() == ASTNodeType.ASSIGNMENT)
+            System.out.println("Right Child "+root.getRightChild());
+        
+        System.out.println("generating Code for "+root.getType().name());
+
         if(root.getLeftChild() != null){
             //if(root.getLeftChild().getType() != ASTNodeType.IDENTIFIER || root.getLeftChild().getType() != ASTNodeType.LITERAL)
             //System.out.print("(");
+            //root.getLeftChild().printNode();
             ASTStackHandler.traverseTree(root.getLeftChild());
-            //if(root.getLeftChild().getType() != ASTNodeType.IDENTIFIER || root.getLeftChild().getType() != ASTNodeType.LITERAL)
-               // System.out.print(")");
-        }
+         }
+         //System.out.println("Identif")
         //root.printNode();
         if(root.getRightChild() != null){
             //if(root.getRightChild().getType() != ASTNodeType.IDENTIFIER || root.getRightChild().getType() != ASTNodeType.LITERAL)
@@ -433,7 +457,7 @@ public class ASTStackHandler
         ASTStackHandler.traverseTree(root.getRightChild());
         //if(root.getRightChild().getType() != ASTNodeType.IDENTIFIER || root.getRightChild().getType() != ASTNodeType.LITERAL)
         //System.out.print(")");
-        }
+        }                
         root.generateIRCode(); 
     }
 

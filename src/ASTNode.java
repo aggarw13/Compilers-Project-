@@ -14,7 +14,7 @@ class ASTNode
 	private ASTNode leftNode = null, rightNode = null;
 	private ASTNode parent = null;
 	private int label = -1, jumpLabel = -1;
-	private List<String> params = new List<String>();
+	private List<String> params = new LinkedList<String>();
 	private DataObject nodeData = new DataObject();
 	private ASTNodeProp nodeInfo;
 
@@ -50,7 +50,7 @@ class ASTNode
 	public int getLabel()
 	{
 		return this.label;
-	}	
+	}
 
 	public void setJumpLabel(int label)
 	{
@@ -148,7 +148,8 @@ class ASTNode
 		IRNode code;
 		switch(this.nodeInfo.type)
 		{
-			case ASSIGNMENT : code = generateIR.assignmentOp(this.leftNode.getDataObject(), this.rightNode.getDataObject()); break;
+			case ASSIGNMENT : 	System.out.println("Right Child of assignment "+this.rightNode.getType().name());
+								code = generateIR.assignmentOp(this.leftNode.getDataObject(), this.rightNode.getDataObject()); break;
 			case OPERATOR : 
 							code = generateIR.arithmeticOp(this.nodeInfo.operator, this.leftNode.getDataObject(), this.rightNode.getDataObject());
 							this.nodeData.setDest(Integer.toString(generateIR.tempNumber - 1)); 
@@ -157,8 +158,17 @@ class ASTNode
 							else if(code.opcode.name().substring(code.opcode.name().length() - 1).equals("I"))
 								this.nodeData.setDataType(VARTYPE.INT);
 							break;
-			case IO : for(String id : this.leftNode.getNameValue().split(",")){
-						generateIR.IOop(this.nodeInfo.ioOp, id, SemanticDataHandler.findRecordScope(id, scopeTable));} break;
+			case IO : for(String id : this.leftNode.getNameValue().split(","))
+						{
+							System.out.println("Current Function in context " + ASTStackHandler.currFunct.label);
+							String id_name = id;
+							if(ASTStackHandler.currFunct.localMap.containsKey(id))
+							{
+								id_name = "$L" + ASTStackHandler.currFunct.localMap.get(id);
+							}
+							System.out.println("Obtained mapped local variable " + id_name);
+							generateIR.IOop(this.nodeInfo.ioOp, id_name, id, SemanticDataHandler.findRecordScope(id, scopeTable));
+						} break;
 			case COMPOP : code = generateIR.compOp(this.nodeInfo.operator, this.leftNode.getDataObject(), this.rightNode.getDataObject()); 
   						  //System.out.println("Jump Label for COMPOP FOR : "+this.jumpLabel);
   						  code.setTarget(Integer.toString(this.getParent().getJumpLabel()));
@@ -182,9 +192,10 @@ class ASTNode
 						break;
 			case FUNC_CALL_BEGIN : generateIR.functionCall(this.id_value, params);
 							  break;
-			case RETURN : generateIR.returnOp(this.rightNode);
+			case RETURN : 	System.out.println("Right child of node "+this.rightNode);
+							generateIR.returnOp(this.rightNode.getDataObject());
 							break;
-			case FUNC_BEGIN : generateIR.jumpLabelIR(IRNode.LABEL, this.id_value);
+			case FUNC_BEGIN : generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, this.id_value);
 							  generateIR.funcScope(this.getType());
 							  break;
 			case  FUNC_END : generateIR.funcScope(this.getType()); 
@@ -195,13 +206,13 @@ class ASTNode
 	{
 		if(this.nodeInfo.type == ASTNodeType.IDENTIFIER)
 		{
-			//System.out.println("Enters IDentifier : "+this.getType().name());
 			if(ASTStackHandler.currFunct != null)
 			{
-				if(ASTStackHandler.currFunct.localMap.containsKey(this.id_value))
-					this.nodeData.setDest("L" + ASTStackHandler.currFunct.localMap.get(this.id_value));
-				else if(ASTStackHandler.currFunct.paramMap.containsKey(this.id_value))
-					this.nodeData.setDest("P" + ASTStackHandler.currFunct.paramMap.get(this.id_value));
+					//System.out.println("Current Function's Local Map" + ASTStackHandler.currFunct.localMap);
+					if(ASTStackHandler.currFunct.localMap.containsKey(this.id_value))
+						this.nodeData.setDest("$L" + ASTStackHandler.currFunct.localMap.get(this.id_value));
+					else if(ASTStackHandler.currFunct.paramMap.containsKey(this.id_value))
+						this.nodeData.setDest("$P" + ASTStackHandler.currFunct.paramMap.get(this.id_value));
 			}
 			else
 				this.nodeData.setDest(this.id_value);
@@ -230,5 +241,7 @@ class ASTNode
 			//System.out.println("Exits Operator object creation");
 			//this.nodeData.setDataType(this.leftNode.getDataObject().getDataType());
 		}
+		else if(this.nodeInfo.type == ASTNodeType.TEMP_VAR)
+			this.nodeData.setType(DataObject.TYPE.FUNC_CALL);
 	}
 }

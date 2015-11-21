@@ -33,7 +33,7 @@ test5 : compiler
 	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step5/EE468/input/$(TESTARGS).micro 
 
 test6 : compiler
-	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step5/EE468/input/$(TESTARGS).micro 
+	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step6/input/$(TESTARGS).micro 
 
 
 clean:

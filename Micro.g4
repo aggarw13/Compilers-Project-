@@ -11,8 +11,8 @@ string_decl       : 'STRING' id ':=' str ';'  {SemanticDataHandler.addScopeRecor
 str               : STRINGLITERAL;
 
 /* Variable Declaration */
-var_decl          : var_type id_list ';' {SemanticDataHandler.addScopeRecord($id_list.text, $var_type.text);   ASTStackHandler.updateFunctionScope($id_list.text, SCOPE.GLOBAL); } ;
-any_type          : var_type | 'VOID';
+var_decl          : var_type id_list ';' {SemanticDataHandler.addScopeRecord($id_list.text, $var_type.text);   ASTStackHandler.updateFunctionScope($id_list.text, SCOPE.LOCAL); } ;
+any_type          : var_type {ASTStackHandler.setFuncRetType($var_type.text);}| 'VOID' {ASTStackHandler.setFuncRetType(new String("VOID"));};
 var_type	      : 'FLOAT'| 'INT';
 id_list           : id id_tail;
 id_tail           : ',' id id_tail | ;
@@ -24,7 +24,7 @@ param_decl_tail   : ',' param_decl param_decl_tail | ;
 
 /* Function Declarations */
 func_declarations : func_decl func_declarations | ;
-func_decl         : 'FUNCTION' any_type id {SemanticDataHandler.pushNewScope(SCOPE.FUNCTION, $id.text); ASTStackHandler.addFunction($id.text, $any_type.text);} '('param_decl_list')' 'BEGIN' func_body 'END' {SemanticDataHandler.popCurrentScope(); ASTStackHandler.pushFuncInfoNode(null, ASTNodeType.FUNC_END);} ;
+func_decl         : 'FUNCTION' any_type id {SemanticDataHandler.pushNewScope(SCOPE.FUNCTION, $id.text); ASTStackHandler.addFunction($id.text);} '('param_decl_list')' 'BEGIN' func_body 'END' {SemanticDataHandler.popCurrentScope(); ASTStackHandler.addFuncInfoNode(ASTNodeType.FUNC_END);} ;
 func_body         : decl stmt_list ;
 
 /* Statement List */
@@ -37,7 +37,7 @@ assign_stmt       : assign_expr ';';
 assign_expr       : id { ASTStackHandler.addTermNode(ASTNodeType.IDENTIFIER, $id.text);} ':=' {ASTStackHandler.pushAssignmentTree(SemanticDataHandler.currentScope);} expr {ASTStackHandler.updateCurrTree();} ;
 read_stmt         : 'READ' '(' id_list ')' {ASTStackHandler.pushIOTree(IO_TYPE.READ, $id_list.text, SemanticDataHandler.currentScope);} ';';
 write_stmt        : 'WRITE' '(' id_list ')' {ASTStackHandler.pushIOTree(IO_TYPE.WRITE, $id_list.text, SemanticDataHandler.currentScope);} ';';
-return_stmt       : 'RETURN' expr ';' {AstStackHandler.pushFuncInfoNode(); } ;
+return_stmt       : 'RETURN' expr ';' {ASTStackHandler.addFuncInfoNode(ASTNodeType.RETURN); } ;
 
 /* Expressions */		
 expr              : expr_prefix factor;
@@ -45,9 +45,9 @@ expr_prefix       : expr_prefix factor addop {ASTStackHandler.createArithmeticTr
 factor            : factor_prefix postfix_expr;
 factor_prefix     : factor_prefix postfix_expr mulop {ASTStackHandler.createArithmeticTree($mulop.text); ASTStackHandler.subExprStack.push("*"); /*ASTStackHandler.SubTreeBlockEnded = false;*/} | ;
 postfix_expr      : primary {ASTStackHandler.SubTreeBlock = false;}| call_expr;
-call_expr         : id {ASTStackHandler.pushFunctionCall($id.text, ASTNodeType.FUNC_CALL_BEGIN);} '(' expr_list ')' {ASTSTackHandler.pushFunctionCall(null, ASTNodeType.FUNC_CALL_END);} ;
-expr_list         : expr {ASTStackHandler.pushFuncParam();} expr_list_tail | ;
-expr_list_tail    : ',' expr expr_list_tail | ;
+call_expr         : id {ASTStackHandler.pushFunctionCall($id.text, ASTNodeType.FUNC_CALL_BEGIN); System.out.println("enters function call node generation");} '(' expr_list ')' {ASTStackHandler.pushFunctionCall(null, ASTNodeType.FUNC_CALL_END);} ;
+expr_list         : expr {ASTStackHandler.pushFuncParamNode();} expr_list_tail | ;
+expr_list_tail    : ',' expr {ASTStackHandler.pushFuncParamNode();} expr_list_tail | ;
 primary           : {/*ASTStackHandler.SubTreeBlock = true; ASTStackHandler.SubTreeBlockEnded = false;*/ ASTStackHandler.subExprStack.push("(");} '(' expr  {/*ASTStackHandler.SubTreeBlock = false; ASTStackHandler.SubTreeBlockEnded = true;*/}  ')' {ASTStackHandler.subExprStack.push(")"); ASTStackHandler.updateCurrSubTree();} | id {ASTStackHandler.addTermNode(ASTNodeType.IDENTIFIER, $id.text); ASTStackHandler.updateCurrSubTree();} | INTLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $INTLITERAL.text); ASTStackHandler.updateCurrSubTree();} | FLOATLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $FLOATLITERAL.text); ASTStackHandler.updateCurrSubTree();};
 addop             : '+' | '-';
 mulop             : '*' | '/';

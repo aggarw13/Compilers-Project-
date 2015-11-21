@@ -6,5 +6,6 @@ public enum SCOPE{
 	GLOBAL, 
 	FUNCTION,
 	BLOCK,
-	PARAM
+	PARAM,
+	LOCAL
 }
