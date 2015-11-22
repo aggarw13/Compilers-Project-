@@ -190,8 +190,7 @@ class ASTNode
 						break;
 			case FUNC_CALL_BEGIN : generateIR.functionCall(this.id_value, params);
 							  break;
-			case RETURN : 	System.out.println("Right child of node "+this.rightNode);
-							generateIR.returnOp(this.rightNode.getDataObject());
+			case RETURN : 	generateIR.returnOp(this.rightNode.getDataObject());
 							break;
 			case FUNC_BEGIN : generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, this.id_value);
 							  generateIR.funcScope(this.getType());
