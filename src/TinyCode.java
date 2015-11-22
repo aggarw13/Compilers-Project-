@@ -66,7 +66,7 @@ import java.lang.Exception.*;
  		PUSH,
  		POP,
  		LINK,
- 		UNLINK,
+ 		UNLNK,
  		RET
  	}
 
@@ -92,16 +92,20 @@ import java.lang.Exception.*;
 	private String setSrcDest(String id)
 	{
 		String updated_id = id;
-		if(generateTinyCode.checkifInt(id))
-			 updated_id = "r" + id;
-		else if(id != null && id.length() > 2)
+		if(id != null)
 		{
-			if(id.substring(0,2).equals("$L"))
-				updated_id = "$-" + id.substring(2);
-			else if(id.substring(0,2).equals("$P"))
-				updated_id = "$" + (5 + Integer.valueOf(id.substring(2))); 
-		}
-		//System.out.println(id.substring(0,2).equals("$L"));
+			if(generateTinyCode.checkifInt(id))
+				 updated_id = "r" + id;
+			else if(id.equals("$R"))
+				updated_id = "$" + Integer.toString(5 + ASTStackHandler.currFunct.paramCount + 1);
+			else if(id.length() > 2)
+			{
+				if(id.substring(0,2).equals("$L"))
+					updated_id = "$-" + id.substring(2);
+				else if(id.substring(0,2).equals("$P"))
+					updated_id = "$" + (5 + Integer.valueOf(id.substring(2))); 
+			}
+		}	
 		return updated_id;
 	}
 
@@ -154,18 +158,19 @@ import java.lang.Exception.*;
 		else if(this.instr_type == TinyCode.INSTR_TYPE.CMP)
 			System.out.println(this.op_jmp.name().toLowerCase() + " " +  src + " " + this.dest);
 		else if(this.instr_type == TinyCode.INSTR_TYPE.JMP)
-			System.out.println(this.op_jmp.name().toLowerCase() + target);
+			System.out.println(this.op_jmp.name().toLowerCase() + " " + target);
 		else if(this.instr_type == TinyCode.INSTR_TYPE.LABEL)
 			System.out.println("label "+ target);
 		else if(this.instr_type == TinyCode.INSTR_TYPE.STACK)
 		{	
 			if(op_stack == TinyCode.OPCODE_STACK.LINK)
-				System.out.println("LINK "+this.linkCount);
+				System.out.println("link "+this.linkCount);
 			else if(this.operand1 != null)
-				System.out.println(this.op_stack.name() + " " + this.operand1);
+				System.out.println(this.op_stack.name().toLowerCase() + " " + this.operand1);
 			else
-				System.out.println(this.op_stack.name());
+				System.out.println(this.op_stack.name().toLowerCase());
 		}
+
 		else if(this.instr_type == TinyCode.INSTR_TYPE.HALT)
 			System.out.println("sys halt");
 	}

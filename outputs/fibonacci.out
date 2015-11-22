@@ -1,276 +1,182 @@
-Token Type: KEYWORD
-Value: PROGRAM
-Token Type: IDENTIFIER
-Value: fibonacci
-Token Type: KEYWORD
-Value: BEGIN
-Token Type: KEYWORD
-Value: STRING
-Token Type: IDENTIFIER
-Value: input
-Token Type: OPERATOR
-Value: :=
-Token Type: STRINGLITERAL
-Value: "Please input an integer number: "
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: STRING
-Token Type: IDENTIFIER
-Value: space
-Token Type: OPERATOR
-Value: :=
-Token Type: STRINGLITERAL
-Value: " "
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: STRING
-Token Type: IDENTIFIER
-Value: eol
-Token Type: OPERATOR
-Value: :=
-Token Type: STRINGLITERAL
-Value: "\n"
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: FUNCTION
-Token Type: KEYWORD
-Value: INT
-Token Type: IDENTIFIER
-Value: F
-Token Type: OPERATOR
-Value: (
-Token Type: KEYWORD
-Value: INT
-Token Type: IDENTIFIER
-Value: n
-Token Type: OPERATOR
-Value: )
-Token Type: KEYWORD
-Value: BEGIN
-Token Type: KEYWORD
-Value: IF
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: n
-Token Type: OPERATOR
-Value: >
-Token Type: INTLITERAL
-Value: 2
-Token Type: OPERATOR
-Value: )
-Token Type: KEYWORD
-Value: RETURN
-Token Type: IDENTIFIER
-Value: F
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: n
-Token Type: OPERATOR
-Value: -
-Token Type: INTLITERAL
-Value: 1
-Token Type: OPERATOR
-Value: )
-Token Type: OPERATOR
-Value: +
-Token Type: IDENTIFIER
-Value: F
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: n
-Token Type: OPERATOR
-Value: -
-Token Type: INTLITERAL
-Value: 2
-Token Type: OPERATOR
-Value: )
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: ELSE
-Token Type: KEYWORD
-Value: IF
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: n
-Token Type: OPERATOR
-Value: =
-Token Type: INTLITERAL
-Value: 0
-Token Type: OPERATOR
-Value: )
-Token Type: KEYWORD
-Value: RETURN
-Token Type: INTLITERAL
-Value: 0
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: ELSE
-Token Type: KEYWORD
-Value: IF
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: n
-Token Type: OPERATOR
-Value: =
-Token Type: INTLITERAL
-Value: 1
-Token Type: OPERATOR
-Value: )
-Token Type: KEYWORD
-Value: RETURN
-Token Type: INTLITERAL
-Value: 1
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: ELSE
-Token Type: KEYWORD
-Value: RETURN
-Token Type: INTLITERAL
-Value: 1
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: FI
-Token Type: KEYWORD
-Value: FI
-Token Type: KEYWORD
-Value: FI
-Token Type: KEYWORD
-Value: END
-Token Type: KEYWORD
-Value: FUNCTION
-Token Type: KEYWORD
-Value: VOID
-Token Type: IDENTIFIER
-Value: main
-Token Type: OPERATOR
-Value: (
-Token Type: OPERATOR
-Value: )
-Token Type: KEYWORD
-Value: BEGIN
-Token Type: KEYWORD
-Value: INT
-Token Type: IDENTIFIER
-Value: i
-Token Type: OPERATOR
-Value: ,
-Token Type: IDENTIFIER
-Value: end
-Token Type: OPERATOR
-Value: ,
-Token Type: IDENTIFIER
-Value: result
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: WRITE
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: input
-Token Type: OPERATOR
-Value: )
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: READ
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: end
-Token Type: OPERATOR
-Value: )
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: FOR
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: i
-Token Type: OPERATOR
-Value: :=
-Token Type: INTLITERAL
-Value: 0
-Token Type: OPERATOR
-Value: ;
-Token Type: IDENTIFIER
-Value: i
-Token Type: OPERATOR
-Value: !=
-Token Type: IDENTIFIER
-Value: end
-Token Type: OPERATOR
-Value: ;
-Token Type: IDENTIFIER
-Value: i
-Token Type: OPERATOR
-Value: :=
-Token Type: IDENTIFIER
-Value: i
-Token Type: OPERATOR
-Value: +
-Token Type: INTLITERAL
-Value: 1
-Token Type: OPERATOR
-Value: )
-Token Type: IDENTIFIER
-Value: result
-Token Type: OPERATOR
-Value: :=
-Token Type: IDENTIFIER
-Value: F
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: i
-Token Type: OPERATOR
-Value: )
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: WRITE
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: i
-Token Type: OPERATOR
-Value: ,
-Token Type: IDENTIFIER
-Value: space
-Token Type: OPERATOR
-Value: )
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: WRITE
-Token Type: OPERATOR
-Value: (
-Token Type: IDENTIFIER
-Value: result
-Token Type: OPERATOR
-Value: ,
-Token Type: IDENTIFIER
-Value: eol
-Token Type: OPERATOR
-Value: )
-Token Type: OPERATOR
-Value: ;
-Token Type: KEYWORD
-Value: ROF
-Token Type: KEYWORD
-Value: END
-Token Type: KEYWORD
-Value: END
+;IR Code
+;LABEL F
+;LINK
+;STOREI 2 $T0
+;LE $P1 $T0 label1
+;SUBI $P1 1 $T1
+;PUSH
+;PUSH $T1
+;JSR F
+;POP
+;POP $T2
+;STOREI $T2 $L1
+;SUBI $P1 2 $T3
+;PUSH
+;PUSH $T3
+;JSR F
+;POP
+;POP $T4
+;STOREI $T4 $L2
+;ADDI $L1 $L2 $T5
+;STOREI $T5 $R
+;RET
+;JUMP label4
+;LABEL label1
+;STOREI 0 $T6
+;NE $P1 $T6 label2
+;STOREI 0 $R
+;RET
+;JUMP label4
+;LABEL label2
+;STOREI 1 $T7
+;NE $P1 $T7 label3
+;STOREI 1 $R
+;RET
+;JUMP label4
+;LABEL label3
+;STOREI 1 $R
+;RET
+;LABEL label4
+;RET
+
+;LABEL main
+;LINK
+;WRITES input
+;READI $L2
+;STOREI 0 $L1
+;LABEL label5
+;STOREI $L2 $T0
+;EQ $L1 $T0 label7
+;PUSH
+;PUSH $L1
+;JSR F
+;POP
+;POP $T1
+;STOREI $T1 $L3
+;WRITEI $L1
+;WRITES space
+;WRITEI $L3
+;WRITES eol
+;LABEL label6
+;ADDI $L1 1 $T2
+;STOREI $T2 $L1
+;JUMP label5
+;LABEL label7
+;STOREI 0 $R
+;RET
+str input "Please input an integer number: "
+str space " "
+str eol "\n"
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+label F
+link 2
+move 2 r0
+cmpi $6 r0
+jle label1
+move $6 r1
+move 1 r2
+subi r2 r1
+push
+push r1
+push r0
+push r1
+push r2
+push r3
+jsr F
+pop r0
+pop r1
+pop r2
+pop r3
+pop
+pop r4
+move r4 $-1
+move $6 r5
+move 2 r6
+subi r6 r5
+push
+push r5
+push r0
+push r1
+push r2
+push r3
+jsr F
+pop r0
+pop r1
+pop r2
+pop r3
+pop
+pop r7
+move r7 $-2
+move $-1 r8
+move $-2 r9
+addi r9 r8
+move r8 $7
+unlnk
+ret
+jmp label4
+label label1
+move 0 r10
+cmpi $6 r10
+jne label2
+move 0 $7
+unlnk
+ret
+jmp label4
+label label2
+move 1 r11
+cmpi $6 r11
+jne label3
+move 1 $7
+unlnk
+ret
+jmp label4
+label label3
+move 1 $7
+unlnk
+ret
+label label4
+unlnk
+ret
+label main
+link 3
+sys writes input
+sys readi $-2
+move 0 $-1
+label label5
+move $-2 r0
+cmpi $-1 r0
+jeq label7
+push
+push $-1
+push r0
+push r1
+push r2
+push r3
+jsr F
+pop r0
+pop r1
+pop r2
+pop r3
+pop
+pop r4
+move r4 $-3
+sys writei $-1
+sys writes space
+sys writei $-3
+sys writes eol
+label label6
+move $-1 r5
+move 1 r6
+addi r6 r5
+move r5 $-1
+jmp label5
+label label7
+move 0 $6
+unlnk
+ret

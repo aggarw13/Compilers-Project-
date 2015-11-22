@@ -45,7 +45,7 @@ expr_prefix       : expr_prefix factor addop {ASTStackHandler.createArithmeticTr
 factor            : factor_prefix postfix_expr;
 factor_prefix     : factor_prefix postfix_expr mulop {ASTStackHandler.createArithmeticTree($mulop.text); ASTStackHandler.subExprStack.push("*"); /*ASTStackHandler.SubTreeBlockEnded = false;*/} | ;
 postfix_expr      : primary {ASTStackHandler.SubTreeBlock = false;}| call_expr;
-call_expr         : id {ASTStackHandler.pushFunctionCall($id.text, ASTNodeType.FUNC_CALL_BEGIN); System.out.println("enters function call node generation");} '(' expr_list ')' {ASTStackHandler.pushFunctionCall(null, ASTNodeType.FUNC_CALL_END);} ;
+call_expr         : id {ASTStackHandler.pushFunctionCall($id.text, ASTNodeType.FUNC_CALL_BEGIN); } '(' expr_list ')' {ASTStackHandler.pushFunctionCall(null, ASTNodeType.FUNC_CALL_END);} ;
 expr_list         : expr {ASTStackHandler.pushFuncParamNode();} expr_list_tail | ;
 expr_list_tail    : ',' expr {ASTStackHandler.pushFuncParamNode();} expr_list_tail | ;
 primary           : {/*ASTStackHandler.SubTreeBlock = true; ASTStackHandler.SubTreeBlockEnded = false;*/ ASTStackHandler.subExprStack.push("(");} '(' expr  {/*ASTStackHandler.SubTreeBlock = false; ASTStackHandler.SubTreeBlockEnded = true;*/}  ')' {ASTStackHandler.subExprStack.push(")"); ASTStackHandler.updateCurrSubTree();} | id {ASTStackHandler.addTermNode(ASTNodeType.IDENTIFIER, $id.text); ASTStackHandler.updateCurrSubTree();} | INTLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $INTLITERAL.text); ASTStackHandler.updateCurrSubTree();} | FLOATLITERAL {ASTStackHandler.addTermNode(ASTNodeType.LITERAL, $FLOATLITERAL.text); ASTStackHandler.updateCurrSubTree();};

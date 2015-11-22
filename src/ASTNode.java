@@ -148,7 +148,7 @@ class ASTNode
 		IRNode code;
 		switch(this.nodeInfo.type)
 		{
-			case ASSIGNMENT : 	System.out.println("Right Child of assignment "+this.rightNode.getType().name());
+			case ASSIGNMENT : 	//System.out.println("Right Child of assignment "+this.rightNode.getType().name());
 								code = generateIR.assignmentOp(this.leftNode.getDataObject(), this.rightNode.getDataObject()); break;
 			case OPERATOR : 
 							code = generateIR.arithmeticOp(this.nodeInfo.operator, this.leftNode.getDataObject(), this.rightNode.getDataObject());
@@ -160,13 +160,11 @@ class ASTNode
 							break;
 			case IO : for(String id : this.leftNode.getNameValue().split(","))
 						{
-							System.out.println("Current Function in context " + ASTStackHandler.currFunct.label);
 							String id_name = id;
 							if(ASTStackHandler.currFunct.localMap.containsKey(id))
-							{
 								id_name = "$L" + ASTStackHandler.currFunct.localMap.get(id);
-							}
-							System.out.println("Obtained mapped local variable " + id_name);
+							else if(ASTStackHandler.currFunct.paramMap.containsKey(id))
+								id_name = "$P" + ASTStackHandler.currFunct.paramMap.get(id);
 							generateIR.IOop(this.nodeInfo.ioOp, id_name, id, SemanticDataHandler.findRecordScope(id, scopeTable));
 						} break;
 			case COMPOP : code = generateIR.compOp(this.nodeInfo.operator, this.leftNode.getDataObject(), this.rightNode.getDataObject()); 

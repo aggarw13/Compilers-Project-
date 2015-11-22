@@ -34,8 +34,6 @@ class Micro
 			for(Iterator<ASTNode> it = ASTStackHandler.getASTFIFO().iterator() ; it.hasNext();)
 			{	
 				root = it.next();
-				//System.out.println("Currently generating code for "+root.getNameValue());
-				
 		        if(root.getType() == ASTNodeType.FOR_INCR)
 		        {
 		            ASTStackHandler.FORincrStack.add(root);
@@ -52,6 +50,15 @@ class Micro
 		        	generateIR.tempNumber = 0;
 		        	ASTStackHandler.currFunct = ASTStackHandler.functionList.get(func_index);
 		        	//ASTStackHandler.currFunct = ASTStackHandler.functionList.get(ASTStackHandler.functionList.indexOf(root.getNameValue()));
+		        }
+		        else if(root.getType() == ASTNodeType.RETURN)
+		        {
+		      		ASTNode next = it.next();
+		      		ASTStackHandler.traverseTree(root);
+		      		if(next.getType() != ASTNodeType.FUNC_END)
+		      			generateIR.funcScope(ASTNodeType.FUNC_END);
+		      		ASTStackHandler.traverseTree(next);
+		        	root = null;
 		        }
 		        //TODO : Needs to be changed to accommodate Subexpression Function Calls
 		        else if(root.getType() == ASTNodeType.ASSIGNMENT && root.getRightChild().getType() == ASTNodeType.TEMP_VAR)
@@ -71,22 +78,27 @@ class Micro
 			        ASTStackHandler.traverseTree(root);
 			       	root = assignNode;
 			    }
-				ASTStackHandler.traverseTree(root);
+			    if(root != null)
+					ASTStackHandler.traverseTree(root);
 			}		
 
-			System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
-
+			//System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
+			System.out.println(";IR Code");
 			generateTinyCode.allocateMemory();
 			generateTinyCode.mainJumpCode();
 			func_index = -1;
 			for(IRNode instr : generateIR.IRCodeList)
 			{
+				if(instr.opcode == IRNode.OPCODE.LABEL && instr.labelTarget.length() > 3 
+					&& !generateTinyCode.checkifInt(instr.labelTarget))
+					System.out.println();
 				System.out.print(";");
 				instr.printIR();
 				if(instr.opcode == IRNode.OPCODE.LINK)
 				{
 					ASTStackHandler.currFunct = ASTStackHandler.functionList.get(++func_index);
 					generateTinyCode.IRTempMap = new HashMap<String,String>();
+					generateTinyCode.regNumber = 0;
 				}
 				generateTinyCode.createCode(instr);
 			}

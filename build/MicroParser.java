@@ -1637,7 +1637,7 @@ public class MicroParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(259); ((Call_exprContext)_localctx).id = id();
-			ASTStackHandler.pushFunctionCall((((Call_exprContext)_localctx).id!=null?_input.getText(((Call_exprContext)_localctx).id.start,((Call_exprContext)_localctx).id.stop):null), ASTNodeType.FUNC_CALL_BEGIN); System.out.println("enters function call node generation");
+			ASTStackHandler.pushFunctionCall((((Call_exprContext)_localctx).id!=null?_input.getText(((Call_exprContext)_localctx).id.start,((Call_exprContext)_localctx).id.stop):null), ASTNodeType.FUNC_CALL_BEGIN); 
 			setState(261); match(6);
 			setState(262); expr_list();
 			setState(263); match(18);

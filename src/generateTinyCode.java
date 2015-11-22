@@ -12,10 +12,13 @@ class generateTinyCode
 
 	public static List<TinyCode> CodeList = new ArrayList<TinyCode>();
 
-	public static int regNumber = 4;
+	public static int regNumber = 0;
 
     //Map from IR Temp registers to Tiny Code temp registers
 	public static Map<String, String> IRTempMap = new HashMap<String, String>();
+	//public static Stack<Map<String,String>> tempMapStack = new Stack<Map<String,String>>();
+
+	//public static Stack<Integer> regStack = new Stack<Integer>();
 	//public static currentIRtemp = 0;
 
 	public static boolean checkifInt(String dest)
@@ -49,9 +52,7 @@ class generateTinyCode
 				break;
 
 				case STRING:
-				System.out.println("Value of str var "+record.getName());
 				TinyCode instr = new TinyCode(TinyCode.INSTR_TYPE.STR, record.getName(), null ,null); 
-				System.out.println("Value of str var ");//+record.getVal());
 				instr.setStrVal(record.getVal());
 				generateTinyCode.CodeList.add(instr);
 			}
@@ -66,7 +67,9 @@ class generateTinyCode
 		generateTinyCode.CodeList.add(node);
 		generateTinyCode.saveRegisters(TinyCode.OPCODE_STACK.PUSH);
 		node = new TinyCode(TinyCode.INSTR_TYPE.JMP, null, null, null);
+		node.setJmpOp(TinyCode.OPCODE_JUMP.JSR);
 		node.setTarget(new String("main"));
+		generateTinyCode.CodeList.add(node);
 		generateTinyCode.CodeList.add(new TinyCode(TinyCode.INSTR_TYPE.HALT, null, null, null));
 	}
 
@@ -77,6 +80,8 @@ class generateTinyCode
 		for(int i = 0; i < 4; i ++)
 		{	
 			node = new TinyCode(TinyCode.INSTR_TYPE.STACK, Integer.toString(i), null, null);
+			if(stack_op == TinyCode.OPCODE_STACK.PUSH && generateTinyCode.regNumber < 4)
+				generateTinyCode.regNumber++;
 			node.setStackOp(stack_op);
 			generateTinyCode.CodeList.add(node);
 		}
@@ -284,13 +289,30 @@ class generateTinyCode
 		}
 		else if(instr_type == TinyCode.INSTR_TYPE.STACK)
 		{	
+			/*if(op_stack == TinyCode.OPCODE_STACK.PUSH) 
+			{
+				op1 = node.operand1; 
+			}
+			else
+			{*/
 			op1 = (op_stack == TinyCode.OPCODE_STACK.PUSH)? node.operand1 : node.dest;
+			if(op1 != null && generateTinyCode.checkifInt(op1))
+			{
+				if(generateTinyCode.IRTempMap.containsKey(op1))
+					op1 = generateTinyCode.IRTempMap.get(op1);
+				else
+				{
+					op1 = Integer.toString(generateTinyCode.regNumber++);
+					generateTinyCode.IRTempMap.put(node.dest, op1);				
+				}
+			}
+
 			instr = new TinyCode(instr_type, op1, null, null);
 			if(op_stack == TinyCode.OPCODE_STACK.LINK)		
 				instr.setLinkCount(ASTStackHandler.currFunct.localVar);
 			else if(op_stack == TinyCode.OPCODE_STACK.RET)
 			{	
-				instr.setStackOp(TinyCode.OPCODE_STACK.UNLINK);
+				instr.setStackOp(TinyCode.OPCODE_STACK.UNLNK);
 				generateTinyCode.CodeList.add(instr);
 				instr = new TinyCode(instr_type, null, null, null);
 			}	

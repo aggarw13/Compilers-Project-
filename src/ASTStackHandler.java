@@ -78,7 +78,6 @@ public class ASTStackHandler
         if(callType == ASTNodeType.FUNC_CALL_END)
         {
             ASTStackHandler.currTermNode = new ASTNode(ASTNodeType.TEMP_VAR, null, null);
-            System.out.println("Size of Sub Tree Stack "+ ASTStackHandler.SubTreeStack.size());
         }
     }
 
@@ -97,7 +96,7 @@ public class ASTStackHandler
         ASTStackHandler.ASTStack.add(node);
         if(type == ASTNodeType.RETURN)
         {
-            ASTStackHandler.updateCurrTree();    
+            ASTStackHandler.updateCurrTree();            
         }
     }
     
@@ -113,13 +112,8 @@ public class ASTStackHandler
 
     public static void updateCurrTree()
     {
-         //ASTNode rightChild = (ASTStackHandler.SubTreeStack.size() > 0)? ASTStackHandler.currTermNode : ASTStackHandler.SubTreeStack.pop();
         if(ASTStackHandler.SubTreeStack.size() == 0)
-        {
-            if(ASTStackHandler.last.getType() != ASTNodeType.RETURN)
-                System.out.println("Left Child of Assignment Tree " + ASTStackHandler.last.getLeftChild());
             ASTStackHandler.last.setRightChild(ASTStackHandler.currTermNode);
-        }
         else
             ASTStackHandler.last.setRightChild(ASTStackHandler.SubTreeStack.pop());
     }
@@ -437,11 +431,6 @@ public class ASTStackHandler
 
         if(root.getType() == ASTNodeType.FOR_INCR)
             generateIR.jumpLabelIR(IRNode.OPCODE.LABEL, Integer.toString(root.getLabel()));
-
-        if(root.getType() == ASTNodeType.ASSIGNMENT)
-            System.out.println("Right Child "+root.getRightChild());
-        
-        System.out.println("generating Code for "+root.getType().name());
 
         if(root.getLeftChild() != null){
             //if(root.getLeftChild().getType() != ASTNodeType.IDENTIFIER || root.getLeftChild().getType() != ASTNodeType.LITERAL)
