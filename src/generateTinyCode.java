@@ -82,8 +82,7 @@ class generateTinyCode
 				TinyCode instr = new TinyCode(TinyCode.INSTR_TYPE.STR, record.getName(), null ,null); 
 				instr.setStrVal(record.getVal());
 				generateTinyCode.CodeList.add(instr);
-			}
-			
+			}	
 		}
 	}
 
@@ -112,9 +111,9 @@ class generateTinyCode
 
 	public static void emptyRegisters()
 	{
-		for(int i = 1; i <=4; i++)
+		for(int i = 0; i < 4; i++)
 		{
-			generateTinyCode.regMap.put(i - 1, null);
+			generateTinyCode.regMap.set(i, null);
 		}
 	}
 
@@ -134,54 +133,101 @@ class generateTinyCode
 
 	public static String obtainMemory(IRNode node, String var)
 	{
-		String regno = ;
-		for(EntrySet<String, regData> entry : generateTinyCode.regMap)
+		int index = 0;
+		String regno;
+		for(regData data : generateTinyCode.regMap)
 		{
-			if(entry.getValue().loc.equals(var))
-				return entry.getKey();
+			if(data != null && data.loc.equals(var))
+				return Integer.toString(index + 1);
+			index++;
 		}
-		return generateTinyCode.allocateRegister(node, var);
+		regno = generateTinyCode.allocateRegister(node, var);
+
+		if(node.live_in.contains(var))
+		{	
+			String src = var;
+			if(generateTinyCode.checkifInt(var))
+			{
+				src = "L" + generateTinyCode.tempTrack.get(generateTinyCode.IRTempMap.get(var));
+			}
+			generateTinyCode.CodeList.add(new TinyCode(TinyCode.INSTR_TYPE.MOVE, var, regno, null));
+		}
+		//Fail Safe recomputation of  avail Reg
+		generateTinyCode.getAvailableRegister();
+		return regno;
+
 	}
 
-	//Alocate register for memory, temp variable
-	public static void allocateRegister(IRnode node, String var)
+	//Allocate register for memory, temp variable
+	public static String allocateRegister(IRnode node, String var)
 	{	
-		boolean allocated = false;
-		for(EntrySet<String, regData> entry : generateTinyCode.regMap)
+		boolean full = false;
+		short allocReg = generateTinyCode.availReg, dirty_live_reg = -1, live_reg = -1;
+		if(!generateTinyCode.getAvailableRegister())
 		{
-
-
+			for(int index = 0; index < 4; index++)
+			{
+				if(node.live_out.contains(generateTinyCode.regMap.get(index).local))	
+				{
+					dirty_live_reg = (generateTinyCode.regMap.get(index).dirty)? index + 1 : dirty_live_reg; 
+					live_reg = index + 1;
+				}
+				else
+				{
+					allocReg = index + 1;
+					full = false;
+					break;
+				}
+				full = true;
+			}
 		}
 
-		if(generateTinyCode.checkifInt(var))
+		if(full)
 		{
-			generate;
+			if(dirty_live_reg != 1)
+			{
+				allocReg = dirty_live_reg;	
+				generateTinyCode.spillRegister(dirty_live_reg);
+			}
+			else
+				allocReg = live_reg;
 		}
 
+		generateTinyCode.regMap.set(allocReg, regData(true, var));
+		return Integer.toString(allocReg);
 	}
 
 	public static void spillRegister(int regno)
 	{
 		generateTinyCode.regMap.get(regno).dirty = 0;
 		String var = generateTinyCode.regMap.get(regno - 1).loc, dest = var;
-		if(genetrateTinyCode.checkifInt(var))
+		//Remeber : Reg Data contains IR Temp number AND IRTempMap, TempTrack contains optimized Temp number
+		if(generateTinyCode.checkifInt(generateTinyCode.regMap.get(regno - 1).loc))
 		{
-			dest = "L" + generateTinyCode.tempTrack.get(var);
+			//DEBUG_CHECK : Temp Stack Offset needs to be consistent
+			generateTinyCode.tempTrack.put(generateTinyCode.IRTempMap.get(var), Integer.toString(generateTinyCode.stackOffset++);
+			dest = "L" + generateTinyCode.stackOffset - 1;
+			IRNode temp_spill = new TinyCode(TinyCode.INSTR_TYPE.STACK, regno, null, null)
+			temp_spill.setStackOp(TinyCode.OPCODE_STACK.PUSH);
+			generateTinyCode.CodeList.add(temp_spill);
 		}
-		generateTinyCode.CodeList.add(new TinyCode(TinyCode.INSTR_TYPE.MOVE, regno, dest,);
+		else
+			generateTinyCode.CodeList.add(new TinyCode(TinyCode.INSTR_TYPE.MOVE, regno, dest, null);
 		generateTinyCode.regMap.set(regno - 1, null);
 		generateTinyCode.availReg = regno;
 	}
 
 	public static void updateMemoryVar()
 	{
+		int index = 1;
 		for(regData data : generateTinyCode.regMap)
 		{
 			if(!SemanticDataHandler.globalScope.checkSymbolValidity(data.local))
-				&& data.dirty == 1 && generateTinyCode.spillRegister();
-			if(!generateTinyCode.checkifInt(entry.getValue())
-			 && generateTinyCode.entry.getValue().substring(0,1).equals("L"))
-				generateTinyCode.spillRegister(entry.getKey());								
+				&& data.dirty == 1 && generateTinyCode.spillRegister(index);
+			if(!generateTinyCode.checkifInt(data.local)
+			 && generateTinyCode.data.local.substring(0,1).equals("L"))
+				generateTinyCode.spillRegister(index);								
+			index++;
 		}
 		//generateTinyCode.put(entry.getKey(), null);
 	}
