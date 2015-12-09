@@ -13,6 +13,7 @@ import java.lang.Exception.*;
  	//public static String 
  	public static int funcRetTemp = 0;
  	public static List<IRNode> IRCodeList = new ArrayList<IRNode>();
+  public static List<IRNode> labelNodes = new ArrayList<IRNode>();
 
  	generateIR(){}
 
@@ -21,7 +22,9 @@ import java.lang.Exception.*;
  		IRNode node = new IRNode(opcode, null, null, null);
  		node.setTarget(labelNo);
  		generateIR.IRCodeList.add(node);
- 		//return node;
+ 		if(opcode == IRNode.OPCODE.LABEL)
+      generateIR.labelNodes.add(node);
+    //return node;
   	}
 
   	public static void funcScope(ASTNodeType type)

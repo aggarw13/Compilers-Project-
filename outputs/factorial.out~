@@ -1,0 +1,140 @@
+rm -rf build
+mkdir build
+java -cp lib/antlr.jar org.antlr.v4.Tool -o build Micro.g4
+rm -rf classes
+mkdir classes
+javac -cp lib/antlr.jar -d classes src/*.java build/*.java
+java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step6/input/factorial2.micro 
+Right child of node ASTNode@69b42301
+Right child of node ASTNode@31664cde
+Right child of node ASTNode@33409c28
+;IR Code
+
+;LABEL factorial
+;LINK
+;STOREI 1 $T0
+;NE $P1 $T0 label1
+;STOREI 1 $R
+;RET
+;JUMP label2
+;LABEL label1
+;SUBI $P1 1 $T1
+;PUSH
+;PUSH $T1
+;JSR factorial
+;POP
+;POP $T2
+;STOREI $T2 $L2
+;MULTI $L2 $P1 $T3
+;STOREI $T3 $L1
+;LABEL label2
+;STOREI $L1 $T4
+;STOREI $T4 $R
+;RET
+
+;LABEL main
+;LINK
+;WRITES input
+;READI $L1
+;STOREI 1 $T0
+;NE $L1 $T0 label3
+;STOREI 1 $L2
+;JUMP label5
+;LABEL label3
+;STOREI 1 $T1
+;LE $L1 $T1 label4
+;PUSH
+;PUSH $L1
+;JSR factorial
+;POP
+;POP $T2
+;STOREI $T2 $L2
+;JUMP label5
+;LABEL label4
+;STOREI 0 $L2
+;LABEL label5
+;WRITEI $L2
+;WRITES eol
+;STOREI 0 $R
+;RET
+str input "Please enter an integer number: "
+str eol "\n"
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+label factorial
+link 2
+move 1 r0
+cmpi $6 r0
+jne label1
+move 1 $7
+unlnk
+ret
+jmp label2
+label label1
+move $6 r1
+move 1 r2
+subi r2 r1
+push
+push r1
+push r0
+push r1
+push r2
+push r3
+jsr factorial
+pop r0
+pop r1
+pop r2
+pop r3
+pop
+pop r4
+move r4 $-2
+move $-2 r5
+move $6 r6
+muli r6 r5
+move r5 $-1
+label label2
+move $-1 r7
+move r7 $7
+unlnk
+ret
+label main
+link 2
+sys writes input
+sys readi $-1
+move 1 r0
+cmpi $-1 r0
+jne label3
+move 1 $-2
+jmp label5
+label label3
+move 1 r1
+cmpi $-1 r1
+jle label4
+push
+push $-1
+push r0
+push r1
+push r2
+push r3
+jsr factorial
+pop r0
+pop r1
+pop r2
+pop r3
+pop
+pop r4
+move r4 $-2
+jmp label5
+label label4
+move 0 $-2
+label label5
+sys writei $-2
+sys writes eol
+move 0 $6
+unlnk
+ret

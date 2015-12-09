@@ -35,6 +35,8 @@ test5 : compiler
 test6 : compiler
 	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step6/input/$(TESTARGS).micro 
 
+test7 : compiler
+	java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step6/input/$(TESTARGS).micro 
 
 clean:
 	rm -rf classes build

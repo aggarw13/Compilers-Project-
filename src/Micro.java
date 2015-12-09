@@ -82,6 +82,8 @@ class Micro
 					ASTStackHandler.traverseTree(root);
 			}		
 
+			CFGHandler.generateCFG();
+
 			//System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
 			System.out.println(";IR Code");
 			generateTinyCode.allocateMemory();
@@ -94,6 +96,11 @@ class Micro
 					System.out.println();
 				System.out.print(";");
 				instr.printIR();
+
+				//DEBUG CFG
+				instr.printPredecessors();
+				instr.printSuccessors();
+
 				if(instr.opcode == IRNode.OPCODE.LINK)
 				{
 					ASTStackHandler.currFunct = ASTStackHandler.functionList.get(++func_index);

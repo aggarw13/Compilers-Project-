@@ -59,12 +59,30 @@ import java.lang.Exception.*;
 	public String operand1, operand2, dest;
 	public String imm1, imm2;
 	public VARTYPE cmprType = VARTYPE.INT;
-	public IRNode(IRNode.OPCODE opcode, String op1, String op2,String result)
+	public List<IRNode> predec = new LinkedList<IRNode>(), success = new LinkedList<IRNode>();
+	public Set<String> live_in = new HashSet<String>(), live_out = new HashSet<String>(), kill = new HashSet<String>(), gen = new HashSet<String>();
+
+	public IRNode(IRNode.OPCODE opcode, String op1, String op2, String result)
 	{
 		this.opcode = opcode;
 		this.operand1 = op1;
 		this.operand2 = op2;
 		this.dest = result;
+		if(dest != null && opcode != OPCODE.JSR)
+		{
+			if(opcode == OPCODE.WRITEI || opcode == OPCODE.WRITEF || opcode == OPCODE.WRITES) 
+				this.gen.add(this.dest);
+			else
+				this.kill.add(dest);
+		}
+		if(op1 != null)
+			this.gen.add(this.operand1);
+		if(op2 != null)
+			this.gen.add(this.operand2);
+		if(opcode == OPCODE.JSR)
+			this.gen.addAll(SemanticDataHandler.globalScope.getRecords());		
+		if(opcode == OPCODE.RET)
+			this.live_out.addAll(SemanticDataHandler.globalScope.getRecords());
 	}
 
 	public void printIR()
@@ -108,4 +126,23 @@ import java.lang.Exception.*;
 		this.labelTarget = target;
 	}
 
+	public void printPredecessors()
+	{
+		System.out.println();
+		for(IRNode node : this.predec)
+		{
+			System.out.println("Label : "+ node.labelTarget);
+		}
+		System.out.println();
+	}
+
+	public void printSuccessors()
+	{
+		System.out.println();
+		for(IRNode node : this.success)
+		{
+			System.out.println("Label : "+ node.labelTarget);
+		}
+		System.out.println();
+	}
 }
