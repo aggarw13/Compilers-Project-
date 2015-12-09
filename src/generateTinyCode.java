@@ -7,20 +7,47 @@ import java.io.*;
 import java.util.*;
 import java.lang.Exception.*;
 
+class regData
+{	
+	public boolean dirty;
+	public String loc;
+
+	regData(String var)
+	{		
+		dirty = false;
+		loc = var;
+	}
+
+	regData(String var, boolean status)
+	{
+		dirty = status;
+		loc = var;
+	}
+}
+
 class generateTinyCode
 {
 
 	public static List<TinyCode> CodeList = new ArrayList<TinyCode>();
 
 	public static int regNumber = 0;
+	public static int availReg = 0;
+
+	//Resest stack this on function call
+	public static int stackOffset = 0; 
 
     //Map from IR Temp registers to Tiny Code temp registers
 	public static Map<String, String> IRTempMap = new HashMap<String, String>();
 	//public static Stack<Map<String,String>> tempMapStack = new Stack<Map<String,String>>();
-
+	public static List<regData> regMap = new ArrayList<regData>(4);
+	public static Map<String, String> tempTrack = new Map<String, String>();
 	//public static Stack<Integer> regStack = new Stack<Integer>();
 	//public static currentIRtemp = 0;
 
+	/*Register Allocation Algo
+     1. Check current status of Registers
+     2. 
+*/
 	public static boolean checkifInt(String dest)
 	{
 		try {
@@ -73,6 +100,24 @@ class generateTinyCode
 		generateTinyCode.CodeList.add(new TinyCode(TinyCode.INSTR_TYPE.HALT, null, null, null));
 	}
 
+	public static boolean getAvailableRegister()
+	{
+		generateTinyCode.availReg = 0;
+		for(int index = 0; index < 4; index++)
+		{
+			if(generateTinyCode.regMap.get(index) == null)
+				generateTinyCode.availReg = Integer.parseInt(entry.getKey());
+		}
+	}
+
+	public static void emptyRegisters()
+	{
+		for(int i = 1; i <=4; i++)
+		{
+			generateTinyCode.regMap.put(i - 1, null);
+		}
+	}
+
 	public static void saveRegisters(TinyCode.OPCODE_STACK stack_op)
 	{
 		//TinyCode.INSTR_TYPE instr = TinyCode.INSTR_TYPE.STACK;s
@@ -85,6 +130,60 @@ class generateTinyCode
 			node.setStackOp(stack_op);
 			generateTinyCode.CodeList.add(node);
 		}
+	}
+
+	public static String obtainMemory(IRNode node, String var)
+	{
+		String regno = ;
+		for(EntrySet<String, regData> entry : generateTinyCode.regMap)
+		{
+			if(entry.getValue().loc.equals(var))
+				return entry.getKey();
+		}
+		return generateTinyCode.allocateRegister(node, var);
+	}
+
+	//Alocate register for memory, temp variable
+	public static void allocateRegister(IRnode node, String var)
+	{	
+		boolean allocated = false;
+		for(EntrySet<String, regData> entry : generateTinyCode.regMap)
+		{
+
+
+		}
+
+		if(generateTinyCode.checkifInt(var))
+		{
+			generate;
+		}
+
+	}
+
+	public static void spillRegister(int regno)
+	{
+		generateTinyCode.regMap.get(regno).dirty = 0;
+		String var = generateTinyCode.regMap.get(regno - 1).loc, dest = var;
+		if(genetrateTinyCode.checkifInt(var))
+		{
+			dest = "L" + generateTinyCode.tempTrack.get(var);
+		}
+		generateTinyCode.CodeList.add(new TinyCode(TinyCode.INSTR_TYPE.MOVE, regno, dest,);
+		generateTinyCode.regMap.set(regno - 1, null);
+		generateTinyCode.availReg = regno;
+	}
+
+	public static void updateMemoryVar()
+	{
+		for(regData data : generateTinyCode.regMap)
+		{
+			if(!SemanticDataHandler.globalScope.checkSymbolValidity(data.local))
+				&& data.dirty == 1 && generateTinyCode.spillRegister();
+			if(!generateTinyCode.checkifInt(entry.getValue())
+			 && generateTinyCode.entry.getValue().substring(0,1).equals("L"))
+				generateTinyCode.spillRegister(entry.getKey());								
+		}
+		//generateTinyCode.put(entry.getKey(), null);
 	}
 
 	public static void createCode(IRNode node)
@@ -135,7 +234,7 @@ class generateTinyCode
 		{
 			//System.out.println("Comes here for MOVE INSTR with dest : "+node.dest);
 			instr = null;
-			dest = node.dest;
+			dest = generateTinyCode.obtainMemory(node.dest);
 			if(generateTinyCode.checkifInt(dest)){
 				if(generateTinyCode.IRTempMap.containsKey(dest))
 					dest = generateTinyCode.IRTempMap.get(dest);
@@ -153,6 +252,7 @@ class generateTinyCode
 				instr = new TinyCode(instr_type, null, dest, node.imm1);
 			generateTinyCode.CodeList.add(instr);
 		}
+
 		else if(instr_type == TinyCode.INSTR_TYPE.ALU)
 		{
 
