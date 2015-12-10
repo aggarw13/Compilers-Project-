@@ -1,0 +1,389 @@
+rm -rf build
+mkdir build
+java -cp lib/antlr.jar org.antlr.v4.Tool -o build Micro.g4
+rm -rf classes
+mkdir classes
+javac -cp lib/antlr.jar -d classes src/*.java build/*.java
+java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step6/input/fibonacci2.micro 
+;IR Code
+;LABEL F
+PRedecessor Nodes
+Sucessor Nodes
+INSTR : LINK
+
+;LINK
+PRedecessor Nodes
+INSTR : LABEL F
+Sucessor Nodes
+INSTR : STOREI 2 $T0
+
+;STOREI 2 $T0
+PRedecessor Nodes
+INSTR : LINK
+Sucessor Nodes
+INSTR : LE $P1 $T0 label1
+
+;LE $P1 $T0 label1
+PRedecessor Nodes
+INSTR : STOREI 2 $T0
+Sucessor Nodes
+INSTR : LABEL label1
+INSTR : SUBI $P1 1 $T1
+
+;SUBI $P1 1 $T1
+PRedecessor Nodes
+INSTR : LE $P1 $T0 label1
+Sucessor Nodes
+INSTR : PUSH
+
+;PUSH
+PRedecessor Nodes
+INSTR : SUBI $P1 1 $T1
+Sucessor Nodes
+INSTR : PUSH $T1
+
+;PUSH $T1
+PRedecessor Nodes
+INSTR : PUSH
+Sucessor Nodes
+INSTR : JSR F
+
+;JSR F
+PRedecessor Nodes
+INSTR : PUSH $T1
+Sucessor Nodes
+INSTR : POP
+
+;POP
+PRedecessor Nodes
+INSTR : JSR F
+Sucessor Nodes
+INSTR : POP $T2
+
+;POP $T2
+PRedecessor Nodes
+INSTR : POP
+Sucessor Nodes
+INSTR : STOREI $T2 $L1
+
+;STOREI $T2 $L1
+PRedecessor Nodes
+INSTR : POP $T2
+Sucessor Nodes
+INSTR : SUBI $P1 2 $T3
+
+;SUBI $P1 2 $T3
+PRedecessor Nodes
+INSTR : STOREI $T2 $L1
+Sucessor Nodes
+INSTR : PUSH
+
+;PUSH
+PRedecessor Nodes
+INSTR : SUBI $P1 2 $T3
+Sucessor Nodes
+INSTR : PUSH $T3
+
+;PUSH $T3
+PRedecessor Nodes
+INSTR : PUSH
+Sucessor Nodes
+INSTR : JSR F
+
+;JSR F
+PRedecessor Nodes
+INSTR : PUSH $T3
+Sucessor Nodes
+INSTR : POP
+
+;POP
+PRedecessor Nodes
+INSTR : JSR F
+Sucessor Nodes
+INSTR : POP $T4
+
+;POP $T4
+PRedecessor Nodes
+INSTR : POP
+Sucessor Nodes
+INSTR : STOREI $T4 $L2
+
+;STOREI $T4 $L2
+PRedecessor Nodes
+INSTR : POP $T4
+Sucessor Nodes
+INSTR : ADDI $L1 $L2 $T5
+
+;ADDI $L1 $L2 $T5
+PRedecessor Nodes
+INSTR : STOREI $T4 $L2
+Sucessor Nodes
+INSTR : STOREI $T5 $R
+
+;STOREI $T5 $R
+PRedecessor Nodes
+INSTR : ADDI $L1 $L2 $T5
+Sucessor Nodes
+INSTR : RET
+
+;RET
+PRedecessor Nodes
+INSTR : STOREI $T5 $R
+Sucessor Nodes
+
+;JUMP label4
+PRedecessor Nodes
+Sucessor Nodes
+INSTR : LABEL label4
+
+;LABEL label1
+PRedecessor Nodes
+INSTR : LE $P1 $T0 label1
+Sucessor Nodes
+INSTR : STOREI 0 $T6
+
+;STOREI 0 $T6
+PRedecessor Nodes
+INSTR : LABEL label1
+Sucessor Nodes
+INSTR : NE $P1 $T6 label2
+
+;NE $P1 $T6 label2
+PRedecessor Nodes
+INSTR : STOREI 0 $T6
+Sucessor Nodes
+INSTR : LABEL label2
+INSTR : STOREI 0 $R
+
+;STOREI 0 $R
+PRedecessor Nodes
+INSTR : NE $P1 $T6 label2
+Sucessor Nodes
+INSTR : RET
+
+;RET
+PRedecessor Nodes
+INSTR : STOREI 0 $R
+Sucessor Nodes
+
+;JUMP label4
+PRedecessor Nodes
+Sucessor Nodes
+INSTR : LABEL label4
+
+;LABEL label2
+PRedecessor Nodes
+INSTR : NE $P1 $T6 label2
+Sucessor Nodes
+INSTR : STOREI 1 $T7
+
+;STOREI 1 $T7
+PRedecessor Nodes
+INSTR : LABEL label2
+Sucessor Nodes
+INSTR : NE $P1 $T7 label3
+
+;NE $P1 $T7 label3
+PRedecessor Nodes
+INSTR : STOREI 1 $T7
+Sucessor Nodes
+INSTR : LABEL label3
+INSTR : STOREI 1 $R
+
+;STOREI 1 $R
+PRedecessor Nodes
+INSTR : NE $P1 $T7 label3
+Sucessor Nodes
+INSTR : RET
+
+;RET
+PRedecessor Nodes
+INSTR : STOREI 1 $R
+Sucessor Nodes
+
+;JUMP label4
+PRedecessor Nodes
+Sucessor Nodes
+INSTR : LABEL label4
+
+;LABEL label3
+PRedecessor Nodes
+INSTR : NE $P1 $T7 label3
+Sucessor Nodes
+INSTR : STOREI 1 $R
+
+;STOREI 1 $R
+PRedecessor Nodes
+INSTR : LABEL label3
+Sucessor Nodes
+INSTR : RET
+
+;RET
+PRedecessor Nodes
+INSTR : STOREI 1 $R
+Sucessor Nodes
+
+;LABEL label4
+PRedecessor Nodes
+INSTR : JUMP label4
+INSTR : JUMP label4
+INSTR : JUMP label4
+Sucessor Nodes
+INSTR : RET
+
+;RET
+PRedecessor Nodes
+INSTR : LABEL label4
+Sucessor Nodes
+
+
+;LABEL main
+PRedecessor Nodes
+Sucessor Nodes
+INSTR : LINK
+
+;LINK
+PRedecessor Nodes
+INSTR : LABEL main
+Sucessor Nodes
+INSTR : WRITES input
+
+;WRITES input
+PRedecessor Nodes
+INSTR : LINK
+Sucessor Nodes
+INSTR : READI $L2
+
+;READI $L2
+PRedecessor Nodes
+INSTR : WRITES input
+Sucessor Nodes
+INSTR : STOREI 0 $L1
+
+;STOREI 0 $L1
+PRedecessor Nodes
+INSTR : READI $L2
+Sucessor Nodes
+INSTR : LABEL label5
+
+;LABEL label5
+PRedecessor Nodes
+INSTR : STOREI 0 $L1
+INSTR : JUMP label5
+Sucessor Nodes
+INSTR : STOREI $L2 $T0
+
+;STOREI $L2 $T0
+PRedecessor Nodes
+INSTR : LABEL label5
+Sucessor Nodes
+INSTR : EQ $L1 $T0 label7
+
+;EQ $L1 $T0 label7
+PRedecessor Nodes
+INSTR : STOREI $L2 $T0
+Sucessor Nodes
+INSTR : LABEL label7
+INSTR : PUSH
+
+;PUSH
+PRedecessor Nodes
+INSTR : EQ $L1 $T0 label7
+Sucessor Nodes
+INSTR : PUSH $L1
+
+;PUSH $L1
+PRedecessor Nodes
+INSTR : PUSH
+Sucessor Nodes
+INSTR : JSR F
+
+;JSR F
+PRedecessor Nodes
+INSTR : PUSH $L1
+Sucessor Nodes
+INSTR : POP
+
+;POP
+PRedecessor Nodes
+INSTR : JSR F
+Sucessor Nodes
+INSTR : POP $T1
+
+;POP $T1
+PRedecessor Nodes
+INSTR : POP
+Sucessor Nodes
+INSTR : STOREI $T1 $L3
+
+;STOREI $T1 $L3
+PRedecessor Nodes
+INSTR : POP $T1
+Sucessor Nodes
+INSTR : WRITEI $L1
+
+;WRITEI $L1
+PRedecessor Nodes
+INSTR : STOREI $T1 $L3
+Sucessor Nodes
+INSTR : WRITES space
+
+;WRITES space
+PRedecessor Nodes
+INSTR : WRITEI $L1
+Sucessor Nodes
+INSTR : WRITEI $L3
+
+;WRITEI $L3
+PRedecessor Nodes
+INSTR : WRITES space
+Sucessor Nodes
+INSTR : WRITES eol
+
+;WRITES eol
+PRedecessor Nodes
+INSTR : WRITEI $L3
+Sucessor Nodes
+INSTR : LABEL label6
+
+;LABEL label6
+PRedecessor Nodes
+INSTR : WRITES eol
+Sucessor Nodes
+INSTR : ADDI $L1 1 $T2
+
+;ADDI $L1 1 $T2
+PRedecessor Nodes
+INSTR : LABEL label6
+Sucessor Nodes
+INSTR : STOREI $T2 $L1
+
+;STOREI $T2 $L1
+PRedecessor Nodes
+INSTR : ADDI $L1 1 $T2
+Sucessor Nodes
+INSTR : JUMP label5
+
+;JUMP label5
+PRedecessor Nodes
+INSTR : STOREI $T2 $L1
+Sucessor Nodes
+INSTR : LABEL label5
+
+;LABEL label7
+PRedecessor Nodes
+INSTR : EQ $L1 $T0 label7
+Sucessor Nodes
+INSTR : STOREI 0 $R
+
+;STOREI 0 $R
+PRedecessor Nodes
+INSTR : LABEL label7
+Sucessor Nodes
+INSTR : RET
+
+;RET
+PRedecessor Nodes
+INSTR : STOREI 0 $R
+Sucessor Nodes
+

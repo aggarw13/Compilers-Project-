@@ -1,0 +1,73 @@
+rm -rf build
+mkdir build
+java -cp lib/antlr.jar org.antlr.v4.Tool -o build Micro.g4
+rm -rf classes
+mkdir classes
+javac -cp lib/antlr.jar -d classes src/*.java build/*.java
+java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step6/input/fibonacci2.micro 
+;IR Code
+;LABEL F
+;LINK
+;STOREI 2 $T0
+;LE $P1 $T0 label1
+;SUBI $P1 1 $T1
+;PUSH
+;PUSH $T1
+;JSR F
+;POP
+;POP $T2
+;STOREI $T2 $L1
+;SUBI $P1 2 $T3
+;PUSH
+;PUSH $T3
+;JSR F
+;POP
+;POP $T4
+;STOREI $T4 $L2
+;ADDI $L1 $L2 $T5
+;STOREI $T5 $R
+;RET
+;JUMP label4
+;LABEL label1
+;STOREI 0 $T6
+;NE $P1 $T6 label2
+;STOREI 0 $R
+;RET
+;JUMP label4
+;LABEL label2
+;STOREI 1 $T7
+;NE $P1 $T7 label3
+;STOREI 1 $R
+;RET
+;JUMP label4
+;LABEL label3
+;STOREI 1 $R
+;RET
+;LABEL label4
+;RET
+
+;LABEL main
+;LINK
+;WRITES input
+;READI $L2
+;STOREI 0 $L1
+;LABEL label5
+;STOREI $L2 $T0
+;EQ $L1 $T0 label7
+;PUSH
+;PUSH $L1
+;JSR F
+;POP
+;POP $T1
+;STOREI $T1 $L3
+;WRITEI $L1
+;WRITES space
+;WRITEI $L3
+;WRITES eol
+;LABEL label6
+;ADDI $L1 1 $T2
+;STOREI $T2 $L1
+;JUMP label5
+;LABEL label7
+;STOREI 0 $R
+;RET

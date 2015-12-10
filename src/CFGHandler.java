@@ -12,7 +12,7 @@ class CFGHandler
 	public static String currTarget = null;
 	public static String currFunct = null;
 
-	public static Queue<IRNode> worklist = new LinkedList<IRNode>();
+	public static Stack<IRNode> worklist = new Stack<IRNode>();
 
 
 /*	public static void findSuccessor()
@@ -39,14 +39,14 @@ class CFGHandler
 	public static void generateCFG()
 	{
 		IRNode prevNode = null, nextNode = null, currNode = null;
-
+		boolean leader_flag = false;
 		for(Iterator<IRNode> it = generateIR.IRCodeList.iterator(); it.hasNext() ;)
 		{
 			prevNode = currNode;
 			currNode = it.next();
 			//nextNode = (generateIR.get(generateIR.indexOf(currNode) + 1);
 			
-			if(prevNode != null && prevNode.opcode != IRNode.OPCODE.RET)
+			if(prevNode != null && prevNode.opcode != IRNode.OPCODE.RET && prevNode.opcode != IRNode.OPCODE.JUMP)
 			{
 				prevNode.success.add(currNode);
 				currNode.predec.add(prevNode);
@@ -61,10 +61,19 @@ class CFGHandler
 				IRNode node = CFGHandler.findLabelNode(currNode.labelTarget);
 				currNode.success.add(node);
 				node.predec.add(currNode);
+				leader_flag = true;
+			}
+
+			else if(currNode.opcode == IRNode.OPCODE.LABEL)
+				currNode.leader = true;
+			
+			if(leader_flag)
+			{
+				currNode.leader = true;
+				leader_flag = false;
 			}
 		}
 	}
-
 
 	//TRUE if LIVE-IN set of Node gets updated
 	public static boolean conductNodeLiveAnalysis(IRNode node)
@@ -73,7 +82,10 @@ class CFGHandler
 		for(IRNode suc_node : node.success)
 		{
 			node.live_out.addAll(suc_node.live_in);
-		}
+		}	
+
+		//System.out.println("Completes Live out computation :");
+		//node.printIR();
 
 		node.live_in.addAll(node.gen);
 
@@ -82,28 +94,45 @@ class CFGHandler
 			if(!node.kill.contains(var))
 				node.live_in.add(var);
 		}
-		return prevLivein.equals(node.live_in);
+
+		//System.out.println("Compltes Live in generation ");
+
+		return !prevLivein.equals(node.live_in);
 	}
 
 
 	public static void computeLiveness()
 	{
 		CFGHandler.worklist.addAll(generateIR.IRCodeList);
+		System.out.println("Size of worklist "+ CFGHandler.worklist.size());
+		IRNode node = null;
 		while(CFGHandler.worklist.size() > 0)
 		{	
-			IRNode node = null;
-			for(Iterator<IRNode> it = worklist.iterator(); it.hasNext();)
+			node = CFGHandler.worklist.pop();
+
+			if(CFGHandler.conductNodeLiveAnalysis(node))
 			{
-				node = it.next();
-				if(CFGHandler.conductNodeLiveAnalysis(node))
+				//System.out.println("Live changes! for adding "+node.predec.size()+ " nodes");
+
+				for(IRNode predecNode : node.predec)
 				{
-					for(IRNode predecNode : node.predec)
-					{
-						CFGHandler.worklist.add(predecNode);
-					}
+					//System.out.println("Predec addition of");
+					CFGHandler.worklist.push(predecNode);
 				}
 			}
 		}
+	}
+
+	public static void printLiveSets()
+	{
+		for(IRNode node : generateIR.IRCodeList)
+		{
+			node.printIR();
+			node.printLiveIn();
+			node.printLiveOut();
+			//System.out.println("Live in SET");
+		}
+
 	}
 
 }

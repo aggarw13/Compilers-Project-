@@ -84,22 +84,31 @@ class Micro
 
 			CFGHandler.generateCFG();
 
+			CFGHandler.computeLiveness();
+
+			//CFGHandler.printLiveSets();
+
 			//System.out.println("Number of IR instructions : "+generateIR.IRCodeList.size());
 			System.out.println(";IR Code");
 			generateTinyCode.allocateMemory();
 			generateTinyCode.mainJumpCode();
 			func_index = -1;
+			generateTinyCode.emptyRegisters(null);
+			
 			for(IRNode instr : generateIR.IRCodeList)
 			{
 				if(instr.opcode == IRNode.OPCODE.LABEL && instr.labelTarget.length() > 3 
 					&& !generateTinyCode.checkifInt(instr.labelTarget))
-					System.out.println();
+						System.out.println();
 				System.out.print(";");
-				instr.printIR();
+				//instr.printIR();
 
 				//DEBUG CFG
-				instr.printPredecessors();
-				instr.printSuccessors();
+				//instr.printPredecessors();
+				//instr.printSuccessors();
+
+				if(instr.leader)
+					generateTinyCode.emptyRegisters(instr);
 
 				if(instr.opcode == IRNode.OPCODE.LINK)
 				{
@@ -119,6 +128,7 @@ class Micro
 		}
 		catch(Exception e)
 		{
+			throw e;
 		}
 	}
 }

@@ -59,6 +59,7 @@ import java.lang.Exception.*;
 	public String operand1, operand2, dest;
 	public String imm1, imm2;
 	public VARTYPE cmprType = VARTYPE.INT;
+	public boolean leader = false;
 	public List<IRNode> predec = new LinkedList<IRNode>(), success = new LinkedList<IRNode>();
 	public Set<String> live_in = new HashSet<String>(), live_out = new HashSet<String>(), kill = new HashSet<String>(), gen = new HashSet<String>();
 
@@ -128,21 +129,46 @@ import java.lang.Exception.*;
 
 	public void printPredecessors()
 	{
-		System.out.println();
+		System.out.println("PRedecessor Nodes");
 		for(IRNode node : this.predec)
 		{
-			System.out.println("Label : "+ node.labelTarget);
+			System.out.print("INSTR : ");node.printIR();
 		}
-		System.out.println();
+	//	System.out.println();
 	}
 
 	public void printSuccessors()
 	{
-		System.out.println();
+		System.out.println("Sucessor Nodes");
 		for(IRNode node : this.success)
 		{
-			System.out.println("Label : "+ node.labelTarget);
+			System.out.print("INSTR : "); node.printIR();
 		}
 		System.out.println();
 	}
+
+	public void printLiveIn()
+	{
+		System.out.println("Live In Set");
+
+		for(String var : this.live_in)
+		{
+			System.out.print(" "+var);
+		}
+
+		System.out.println();
+	}
+
+	public void printLiveOut()
+	{
+		System.out.println("Live Out Set");
+
+		for(String var : this.live_out)
+		{
+			System.out.print(" "+var);
+		}
+		
+		System.out.println();
+	}
+
 }
