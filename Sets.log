@@ -4,3 +4,337 @@ java -cp lib/antlr.jar org.antlr.v4.Tool -o build Micro.g4
 rm -rf classes
 mkdir classes
 javac -cp lib/antlr.jar -d classes src/*.java build/*.java
+java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step6/input/fibonacci2.micro 
+Size of worklist 64
+LABEL F
+Live In Set
+ input eol space $P1
+Live Out Set
+ input eol space $P1
+LINK
+Live In Set
+ input eol space $P1
+Live Out Set
+ input eol space $P1
+STOREI 2 $T0
+Live In Set
+ input eol space $P1
+Live Out Set
+ input 0 eol space $P1
+LE $P1 $T0 label1
+Live In Set
+ input 0 eol space $P1
+Live Out Set
+ input eol space $P1
+SUBI $P1 1 $T1
+Live In Set
+ input eol space $P1
+Live Out Set
+ 1 input eol space $P1
+PUSH
+Live In Set
+ input 1 eol space $P1
+Live Out Set
+ 1 input eol space $P1
+PUSH $T1
+Live In Set
+ input 1 eol space $P1
+Live Out Set
+ input eol space $P1
+JSR F
+Live In Set
+ input eol space $P1
+Live Out Set
+ input eol space $P1
+POP
+Live In Set
+ input eol space $P1
+Live Out Set
+ input eol space $P1
+POP $T2
+Live In Set
+ input eol space $P1
+Live Out Set
+ input eol space $P1
+STOREI $T2 $L1
+Live In Set
+ input eol space $P1
+Live Out Set
+ input eol $L1 space $P1
+SUBI $P1 2 $T3
+Live In Set
+ input $L1 eol space $P1
+Live Out Set
+ 3 input eol $L1 space
+PUSH
+Live In Set
+ 3 input $L1 eol space
+Live Out Set
+ 3 input eol $L1 space
+PUSH $T3
+Live In Set
+ 3 input $L1 eol space
+Live Out Set
+ input eol $L1 space
+JSR F
+Live In Set
+ input $L1 eol space
+Live Out Set
+ input $L1 eol space
+POP
+Live In Set
+ input eol $L1 space
+Live Out Set
+ input $L1 eol space
+POP $T4
+Live In Set
+ input eol $L1 space
+Live Out Set
+ input $L1 eol space
+STOREI $T4 $L2
+Live In Set
+ input eol $L1 space
+Live Out Set
+ input $L1 eol $L2 space
+ADDI $L1 $L2 $T5
+Live In Set
+ input eol $L1 $L2 space
+Live Out Set
+ input 5 eol space
+STOREI $T5 $R
+Live In Set
+ input 5 eol space
+Live Out Set
+ input eol space
+RET
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+JUMP label4
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+LABEL label1
+Live In Set
+ input eol space $P1
+Live Out Set
+ input eol space $P1
+STOREI 0 $T6
+Live In Set
+ input eol space $P1
+Live Out Set
+ input 6 eol space $P1
+NE $P1 $T6 label2
+Live In Set
+ input 6 eol space $P1
+Live Out Set
+ input eol space $P1
+STOREI 0 $R
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+RET
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+JUMP label4
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+LABEL label2
+Live In Set
+ input eol space $P1
+Live Out Set
+ input eol space $P1
+STOREI 1 $T7
+Live In Set
+ input eol space $P1
+Live Out Set
+ input 7 eol space $P1
+NE $P1 $T7 label3
+Live In Set
+ input 7 eol space $P1
+Live Out Set
+ input eol space
+STOREI 1 $R
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+RET
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+JUMP label4
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+LABEL label3
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+STOREI 1 $R
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+RET
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+LABEL label4
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+RET
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+LABEL main
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+LINK
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+WRITES input
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+READI $L2
+Live In Set
+ input eol space
+Live Out Set
+ input eol $L2 space
+STOREI 0 $L1
+Live In Set
+ input eol $L2 space
+Live Out Set
+ input $L1 eol $L2 space
+LABEL label5
+Live In Set
+ input eol $L1 $L2 space
+Live Out Set
+ input $L1 eol $L2 space
+STOREI $L2 $T0
+Live In Set
+ input eol $L1 $L2 space
+Live Out Set
+ input 0 $L1 eol space
+EQ $L1 $T0 label7
+Live In Set
+ input 0 eol $L1 space
+Live Out Set
+ input $L1 eol space
+PUSH
+Live In Set
+ input eol $L1 space
+Live Out Set
+ input $L1 eol space
+PUSH $L1
+Live In Set
+ input eol $L1 space
+Live Out Set
+ input eol $L1 space
+JSR F
+Live In Set
+ input $L1 eol space
+Live Out Set
+ $L1 eol space
+POP
+Live In Set
+ eol $L1 space
+Live Out Set
+ $L1 eol space
+POP $T1
+Live In Set
+ eol $L1 space
+Live Out Set
+ $L1 eol space
+STOREI $T1 $L3
+Live In Set
+ eol $L1 space
+Live Out Set
+ $L1 eol $L3 space
+WRITEI $L1
+Live In Set
+ eol $L1 $L3 space
+Live Out Set
+ eol $L1 $L3 space
+WRITES space
+Live In Set
+ $L1 eol $L3 space
+Live Out Set
+ eol $L1 $L3
+WRITEI $L3
+Live In Set
+ $L1 eol $L3
+Live Out Set
+ eol $L1
+WRITES eol
+Live In Set
+ $L1 eol
+Live Out Set
+ $L1
+LABEL label6
+Live In Set
+ $L1
+Live Out Set
+ $L1
+ADDI $L1 1 $T2
+Live In Set
+ $L1
+Live Out Set
+
+STOREI $T2 $L1
+Live In Set
+
+Live Out Set
+
+JUMP label5
+Live In Set
+
+Live Out Set
+
+LABEL label7
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+STOREI 0 $R
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+RET
+Live In Set
+ input eol space
+Live Out Set
+ input eol space
+;IR Code
+;Current node is a leader
+;;;;;;;;;;;;;;;;;;;;;;Current node is a leader
+;;;;;;Current node is a leader
+;;;;;;Current node is a leader
+;;;Current node is a leader
+;
+;Current node is a leader
+;;;;;Current node is a leader
+;;;;;;;;;;;;;Current node is a leader
+;;;;Current node is a leader
+;;

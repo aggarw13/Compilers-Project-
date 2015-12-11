@@ -94,23 +94,26 @@ class Micro
 			generateTinyCode.mainJumpCode();
 			func_index = -1;
 			generateTinyCode.emptyRegisters(null);
-			
+
 			for(IRNode instr : generateIR.IRCodeList)
 			{
 				if(instr.opcode == IRNode.OPCODE.LABEL && instr.labelTarget.length() > 3 
 					&& !generateTinyCode.checkifInt(instr.labelTarget))
 						System.out.println();
 				System.out.print(";");
-				//instr.printIR();
+				instr.printIR();
 
 				//DEBUG CFG
 				//instr.printPredecessors();
 				//instr.printSuccessors();
 
 				if(instr.leader)
+				{
+					System.out.println("Current node is a leader");
 					generateTinyCode.emptyRegisters(instr);
+				}
 
-				if(instr.opcode == IRNode.OPCODE.LINK)
+				if(instr.opcode == IRNode.OPCODE.LABEL && !generateTinyCode.checkifInt(instr.labelTarget))
 				{
 					ASTStackHandler.currFunct = ASTStackHandler.functionList.get(++func_index);
 					generateTinyCode.IRTempMap = new HashMap<String,String>();

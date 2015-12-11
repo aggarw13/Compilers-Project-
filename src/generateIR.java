@@ -73,6 +73,7 @@ import java.lang.Exception.*;
   			generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.POP, null, null, null));
   		} 
 		  generateIR.IRCodeList.add(new IRNode(IRNode.OPCODE.POP, null, null, Integer.toString(generateIR.tempNumber++)));
+      ASTStackHandler.currFunct.incTempCount();
   		generateIR.funcRetTemp = generateIR.tempNumber - 1;
   	}
 
@@ -99,9 +100,10 @@ import java.lang.Exception.*;
  			opNode.setImm1(imm1);
 			generateIR.IRCodeList.add(opNode);
  		}*/
-  		if(right.getValueType() == DataObject.TYPE.CONSTANT || right.getValueType() == DataObject.TYPE.L)
+  	if(right.getValueType() == DataObject.TYPE.CONSTANT || right.getValueType() == DataObject.TYPE.L)
  		{
- 			if(left.getValueType() != DataObject.TYPE.CONSTANT && generateTinyCode.checkifInt(left.getDest()))
+ 			
+      if(left.getValueType() != DataObject.TYPE.CONSTANT && generateTinyCode.checkifInt(left.getDest()))
  			{
  				compOrder = false;
  				op1 = right.getDest();
@@ -111,6 +113,7 @@ import java.lang.Exception.*;
  			{
  				op2 = Integer.toString(generateIR.tempNumber++);
  				op1 = null;
+        ASTStackHandler.currFunct.incTempCount();
  				if(right.getValueType() == DataObject.TYPE.L)
  					op1 = right.getDest();
  				else	
@@ -187,6 +190,7 @@ import java.lang.Exception.*;
  		if(/*Rnode.getValueType() == DataObject.TYPE.CONSTANT || */Rnode.getValueType() == DataObject.TYPE.L)
  		{
  			node = new IRNode(assgnOP, null, null, Integer.toString(generateIR.tempNumber++));
+        ASTStackHandler.currFunct.incTempCount();
       node.operand1 = Rnode.getDest();
  			/*else
  				node.setImm1(Rnode.getDest());*/

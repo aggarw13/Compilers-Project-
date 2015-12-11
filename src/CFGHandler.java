@@ -40,6 +40,13 @@ class CFGHandler
 	{
 		IRNode prevNode = null, nextNode = null, currNode = null;
 		boolean leader_flag = false;
+		
+			if(leader_flag)
+			{
+				currNode.leader = true;
+				leader_flag = false;
+			}
+
 		for(Iterator<IRNode> it = generateIR.IRCodeList.iterator(); it.hasNext() ;)
 		{
 			prevNode = currNode;
@@ -66,12 +73,6 @@ class CFGHandler
 
 			else if(currNode.opcode == IRNode.OPCODE.LABEL)
 				currNode.leader = true;
-			
-			if(leader_flag)
-			{
-				currNode.leader = true;
-				leader_flag = false;
-			}
 		}
 	}
 
@@ -85,7 +86,7 @@ class CFGHandler
 		}	
 
 		//System.out.println("Completes Live out computation :");
-		//node.printIR();
+		//node.printIR()
 
 		node.live_in.addAll(node.gen);
 
