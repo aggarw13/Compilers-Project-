@@ -51,7 +51,6 @@ class CFGHandler
 		{
 			prevNode = currNode;
 			currNode = it.next();
-			//nextNode = (generateIR.get(generateIR.indexOf(currNode) + 1);
 			
 			if(prevNode != null && prevNode.opcode != IRNode.OPCODE.RET && prevNode.opcode != IRNode.OPCODE.JUMP)
 			{
@@ -85,9 +84,6 @@ class CFGHandler
 			node.live_out.addAll(suc_node.live_in);
 		}	
 
-		//System.out.println("Completes Live out computation :");
-		//node.printIR()
-
 		node.live_in.addAll(node.gen);
 
 		for(String var : node.live_out)
@@ -96,8 +92,6 @@ class CFGHandler
 				node.live_in.add(var);
 		}
 
-		//System.out.println("Compltes Live in generation ");
-
 		return !prevLivein.equals(node.live_in);
 	}
 
@@ -105,7 +99,6 @@ class CFGHandler
 	public static void computeLiveness()
 	{
 		CFGHandler.worklist.addAll(generateIR.IRCodeList);
-		System.out.println("Size of worklist "+ CFGHandler.worklist.size());
 		IRNode node = null;
 		while(CFGHandler.worklist.size() > 0)
 		{	
@@ -113,11 +106,8 @@ class CFGHandler
 
 			if(CFGHandler.conductNodeLiveAnalysis(node))
 			{
-				//System.out.println("Live changes! for adding "+node.predec.size()+ " nodes");
-
 				for(IRNode predecNode : node.predec)
 				{
-					//System.out.println("Predec addition of");
 					CFGHandler.worklist.push(predecNode);
 				}
 			}
@@ -131,7 +121,6 @@ class CFGHandler
 			node.printIR();
 			node.printLiveIn();
 			node.printLiveOut();
-			//System.out.println("Live in SET");
 		}
 
 	}

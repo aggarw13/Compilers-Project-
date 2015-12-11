@@ -1,0 +1,117 @@
+;IR Code
+
+;LABEL main
+;LINK
+;STOREF 0.0001 tolerance
+;READF num
+;STOREF num $T0
+;STOREF $T0 approx
+;STOREI 0 count
+;STOREF 0.0 diff
+;STOREI 0 enough
+;LABEL label1
+;STOREI 1 $T1
+;EQ enough $T1 label6
+;ADDI count 1 $T2
+;STOREI $T2 count
+;DIVF num approx $T3
+;ADDF approx $T3 $T4
+;MULTF 0.5 $T4 $T5
+;STOREF $T5 newapprox
+;SUBF approx newapprox $T6
+;STOREF $T6 diff
+;STOREF 0.0 $T7
+;LE diff $T7 label3
+;STOREF tolerance $T8
+;GE diff $T8 label2
+;STOREI 1 enough
+;LABEL label2
+;JUMP label4
+;LABEL label3
+;SUBF 0.0 tolerance $T9
+;LE diff $T9 label4
+;STOREI 1 enough
+;LABEL label4
+;STOREF newapprox $T10
+;STOREF $T10 approx
+;LABEL label5
+;JUMP label1
+;LABEL label6
+;WRITEF approx
+;WRITES space
+;WRITEI count
+;WRITES eol
+;RET
+var count
+var enough
+var newapprox
+var approx
+var num
+var tolerance
+var diff
+str eol "\n"
+str space " "
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+label main
+link 0
+move 0.0001 tolerance
+sys readr num
+move num r0
+move r0 approx
+move 0 count
+move 0.0 diff
+move 0 enough
+label label1
+move 1 r0
+cmpi enough r0
+jeq label6
+move count r0
+move r0 r1
+addi 1 r1
+move r1 count
+move num r0
+move approx r1
+move r0 r2
+divr r1 r2
+move r1 r0
+addr r2 r0
+move 0.5 r0
+mulr r0 r0
+move r0 newapprox
+move newapprox r0
+move r1 r2
+subr r0 r2
+move r2 diff
+move 0.0 r0
+cmpr diff r0
+jle label3
+move tolerance r0
+cmpr diff r0
+jge label2
+move 1 enough
+label label2
+jmp label4
+label label3
+move 0.0 r0
+subr tolerance r0
+cmpr diff r0
+jle label4
+move 1 enough
+label label4
+move newapprox r0
+move r0 approx
+label label5
+jmp label1
+label label6
+sys writer approx
+sys writes space
+sys writei count
+sys writes eol
+unlnk
+ret

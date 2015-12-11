@@ -1,0 +1,73 @@
+;IR Code
+
+;LABEL main
+;LINK
+;STOREI 20 a
+;STOREI 30 b
+;STOREI 40 c
+;MULTI a b $T0
+;ADDI c $T0 $T1
+;MULTI a b $T2
+;ADDI $T2 c $T3
+;DIVI $T3 a $T4
+;ADDI $T1 $T4 $T5
+;ADDI $T5 20 $T6
+;STOREI $T6 c
+;MULTI b b $T7
+;ADDI $T7 a $T8
+;STOREI $T8 b
+;MULTI b a $T9
+;DIVI $T9 a $T10
+;STOREI $T10 a
+;WRITEI c
+;WRITEI b
+;WRITEI a
+;RET
+var a
+var b
+var c
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+label main
+link 0
+move 20 a
+move 30 b
+move 40 c
+move a r0
+move b r1
+move r0 r2
+muli r1 r2
+move c r3
+move r3 r3
+addi r2 r3
+move r0 r2
+muli r1 r2
+move r2 r3
+addi c r3
+move r3 r3
+divi a r3
+move r3 r3
+addi r3 r3
+move r3 r3
+addi 20 r3
+move r3 c
+move r1 r2
+muli r1 r2
+move r2 r3
+addi a r3
+move r3 b
+move r1 r2
+muli r0 r2
+move r2 r3
+divi a r3
+move r3 a
+sys writei c
+sys writei b
+sys writei a
+unlnk
+ret

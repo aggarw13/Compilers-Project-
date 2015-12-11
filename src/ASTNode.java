@@ -203,15 +203,22 @@ class ASTNode
 	{
 		if(this.nodeInfo.type == ASTNodeType.IDENTIFIER)
 		{
+			boolean globalId = true;
 			if(ASTStackHandler.currFunct != null)
 			{
 					//System.out.println("Current Function's Local Map" + ASTStackHandler.currFunct.localMap);
 					if(ASTStackHandler.currFunct.localMap.containsKey(this.id_value))
+					{
 						this.nodeData.setDest("$L" + ASTStackHandler.currFunct.localMap.get(this.id_value));
+						globalId = false;
+					}
 					else if(ASTStackHandler.currFunct.paramMap.containsKey(this.id_value))
+					{
+						globalId = false;
 						this.nodeData.setDest("$P" + ASTStackHandler.currFunct.paramMap.get(this.id_value));
+					}
 			}
-			else
+			if(globalId)
 				this.nodeData.setDest(this.id_value);
 			//System.out.println("")
 			this.nodeData.setType(DataObject.TYPE.L);

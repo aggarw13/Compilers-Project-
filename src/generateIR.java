@@ -181,7 +181,6 @@ import java.lang.Exception.*;
  	public static IRNode assignmentOp(DataObject Lnode, DataObject Rnode)
  	{	
  		IRNode node;
- 		//System.out.println("Enters Assignment Code generation");
  		IRNode.OPCODE assgnOP = IRNode.OPCODE.STOREI;
  		IRNode assgnNode;
  		if(Lnode.getDataType() == VARTYPE.FLOAT && Rnode.getDataType() == VARTYPE.FLOAT)

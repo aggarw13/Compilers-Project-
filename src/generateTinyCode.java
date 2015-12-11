@@ -480,8 +480,6 @@ class generateTinyCode
 						op2 = node.operand2;
 				}
 
-				System.out.println("Operand 1 is "+node.operand1);
-
 				if(node.operand1 != null)
 				{
 					map = null;
@@ -493,63 +491,13 @@ class generateTinyCode
 					op1 = generateTinyCode.obtainMemory(node, node.operand1, map);
 				}
 
-				//System.out.println("Allocation of valid operand1");
 
 				dest = Integer.toString(generateTinyCode.regNumber++);
 				dest = generateTinyCode.obtainMemory(node, node.dest, dest);
 				generateTinyCode.IRTempMap.put(node.dest, Integer.toString(generateTinyCode.regNumber - 1));
 				generateTinyCode.CodeList.add(new TinyCode(TinyCode.INSTR_TYPE.MOVE, op1, dest, node.imm1));
-				
-				//System.out.println("Guranteed allocation of register");
-
-				//dest = (node.operand2 != null)? node.operand2 : node.imm2;
-
-				//Check for Division Condition
-/*
-
-				if(generateTinyCode.checkifInt(node.operand2))
-				{
-					op1 = node.operand1;
-					dest = generateTinyCode.IRTempMap.get(node.operand2);
-					if(generateTinyCode.IRTempMap.containsKey(op1))
-						op1 = generateTinyCode.IRTempMap.get(op1);
-					else if(!generateTinyCode.checkifInt(node.operand1) && node.operand1 != null)
-					{	
-						instr = new TinyCode(TinyCode.INSTR_TYPE.MOVE, node.operand1, Integer.toString(generateTinyCode.regNumber++), null);	
-						generateTinyCode.CodeList.add(instr);
-						//generateTinyCode.IRTempMap.put(node.operand1, generateTinyCode.regNumber++);
-						op1 = Integer.toString(generateTinyCode.regNumber - 1);
-					}
-				}
-				if(generateTinyCode.checkifInt(node.operand1)){
-					op1 = node.operand2;
-					dest = generateTinyCode.IRTempMap.get(node.operand1);
-					if(generateTinyCode.IRTempMap.containsKey(op1))
-						op1 = generateTinyCode.IRTempMap.get(op1);
-					else if(!generateTinyCode.checkifInt(node.operand2) && node.operand2 != null)
-					{	
-						instr = new TinyCode(TinyCode.INSTR_TYPE.MOVE, node.operand2, Integer.toString(generateTinyCode.regNumber++), null);
-						generateTinyCode.CodeList.add(instr);
-						op1 = Integer.toString(generateTinyCode.regNumber - 1);
-					}
-				}
-
-				if(!generateTinyCode.IRTempMap.containsKey(node.operand1) && (node.opcode == IRNode.OPCODE.DIVF || node.opcode == IRNode.OPCODE.SUBF)){
-					//dest = Integer.toString(generateTinyCode.regNumber++);
-					op1 = generateTinyCode.IRTempMap.get(node.operand2);
-					if(node.operand1 == null)
-					{
-						instr = new TinyCode(TinyCode.INSTR_TYPE.MOVE, node.imm1, Integer.toString(generateTinyCode.regNumber++), null);
-						dest = Integer.toString(generateTinyCode.regNumber++);
-						generateTinyCode.CodeList.add(instr);
-					}
-					else 
-						dest = Integer.toString(generateTinyCode.regNumber - 1);
-					//generateTinyCode.IRTempMap.put(node.dest, Integer.toString(generateTinyCode.regNumber - 1));
-				}*/
 
 				instr = new TinyCode(instr_type, op2, dest, imm);
-				//generateTinyCode.IRTempMap.put(node.dest, Integer.toString(generateTinyCode.regNumber - 1));
 				instr.setArithOp(op_arith);
 				generateTinyCode.CodeList.add(instr);
 			}

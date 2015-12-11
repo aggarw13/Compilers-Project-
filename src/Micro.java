@@ -108,10 +108,7 @@ class Micro
 				//instr.printSuccessors();
 
 				if(instr.leader)
-				{
-					System.out.println("Current node is a leader");
 					generateTinyCode.emptyRegisters(instr);
-				}
 
 				if(instr.opcode == IRNode.OPCODE.LABEL && !generateTinyCode.checkifInt(instr.labelTarget))
 				{
