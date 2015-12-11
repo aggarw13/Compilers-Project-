@@ -29,9 +29,12 @@ class regData
 	{
 		if(opt_map == null || temp == null)
 			return false;
-		else if(opt_map.equals(temp))
+		if(opt_map.equals(temp))
+		{
 			this.loc = new_loc;
-		return true;
+			return true;
+		}
+		return false;
 	}
 
 }
@@ -247,11 +250,6 @@ class generateTinyCode
 			else 
 				allocReg = live_reg;
 		}
-		/*else if(allocReg == -1)
-		{
-			generateTinyCode.getAvailableRegister();
-			allocReg = generateTinyCode.availReg;
-		}*/
 
 		//System.out.println("Allocation chosen for "+var+ " "+allocReg);
 		
@@ -265,14 +263,12 @@ class generateTinyCode
 		if(generateTinyCode.checkifInt(var))
 			generateTinyCode.regMap.get(allocReg).temp = temp_map;
 
-		//System.out.println("Reg 0 occupies  "+generateTinyCode.regMap.get(0).loc);	
-
 		return Integer.toString(allocReg);
 	}
 
 	public static void spillRegister(int regno)
 	{
-		System.out.println("Chosen Register for Spilling" + regno);
+		//System.out.println("Chosen Register for Spilling" + regno);
 		generateTinyCode.regMap.get(regno).dirty = false;
 		String var = generateTinyCode.regMap.get(regno).loc, dest = var;
 		//Remeber : Reg Data contains IR Temp number AND IRTempMap, TempTrack contains optimized Temp number
@@ -383,6 +379,7 @@ class generateTinyCode
 					generateTinyCode.IRTempMap.put(node.dest, Integer.toString(generateTinyCode.regNumber - 1));
 				}
 				dest = generateTinyCode.obtainMemory(node, node.dest, generateTinyCode.IRTempMap.get(dest));
+				//generateTinyCode.regMap.get(Integer.parseInt(dest)).dirty = true;
 			}
 
 			if(node.operand1 != null)
@@ -463,7 +460,7 @@ class generateTinyCode
 
 				String map, op2 = null;
 
-				op1 =node.operand1;
+				op1 = node.operand1;
 
 				if(node.operand2 != null)
 				{
@@ -483,19 +480,26 @@ class generateTinyCode
 				if(node.operand1 != null)
 				{
 					map = null;
-					if(generateTinyCode.checkifInt(node.operand1) && (map = generateTinyCode.IRTempMap.get(node.operand1)) == null)
+					if(generateTinyCode.checkifInt(node.operand1))
 					{
-						generateTinyCode.IRTempMap.put(node.operand1, Integer.toString(generateTinyCode.regNumber++));
-						map = Integer.toString(generateTinyCode.regNumber - 1);
+						map = generateTinyCode.IRTempMap.get(node.operand1);
+						if(map == null)
+						{
+							map = Integer.toString(generateTinyCode.regNumber++);
+							generateTinyCode.IRTempMap.put(node.operand1, Integer.toString(generateTinyCode.regNumber - 1));
+						}
 					}
 					op1 = generateTinyCode.obtainMemory(node, node.operand1, map);
+					//generateTinyCode.regMap.get(Integer.parseInt(dest)).dirty = true;
 				}
 
-
+				//if(node.imm1 != null)
+				//{
 				dest = Integer.toString(generateTinyCode.regNumber++);
 				dest = generateTinyCode.obtainMemory(node, node.dest, dest);
 				generateTinyCode.IRTempMap.put(node.dest, Integer.toString(generateTinyCode.regNumber - 1));
 				generateTinyCode.CodeList.add(new TinyCode(TinyCode.INSTR_TYPE.MOVE, op1, dest, node.imm1));
+				//}
 
 				instr = new TinyCode(instr_type, op2, dest, imm);
 				instr.setArithOp(op_arith);
@@ -544,12 +548,7 @@ class generateTinyCode
 		}
 		else if(instr_type == TinyCode.INSTR_TYPE.STACK)
 		{	
-			/*if(op_stack == TinyCode.OPCODE_STACK.PUSH) 
-			{
-				op1 = node.operand1; 
-			}
-			else
-			{*/
+
 			String temp = null;
 			op1 = (op_stack == TinyCode.OPCODE_STACK.PUSH)? node.operand1 : node.dest;
 			if(op1 != null && generateTinyCode.checkifInt(op1))
@@ -565,12 +564,13 @@ class generateTinyCode
 
 			op1 = generateTinyCode.obtainMemory(node, op1, temp);
 
+
 			instr = new TinyCode(instr_type, op1, null, null);
 
 			//POSSIBLE OPTIMIZATION OF LINK COUNT FOR UPDATING ALL function temp counts after register allocation 
 			if(op_stack == TinyCode.OPCODE_STACK.LINK)		
 
-				instr.setLinkCount(ASTStackHandler.currFunct.localVar);
+				instr.setLinkCount(ASTStackHandler.currFunct.localVar/* + ASTStackHandler.currFunct.tempCount*/);
 			else if(op_stack == TinyCode.OPCODE_STACK.RET)
 			{	
 				instr.setStackOp(TinyCode.OPCODE_STACK.UNLNK);

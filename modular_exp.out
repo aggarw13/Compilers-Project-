@@ -1,0 +1,85 @@
+rm -rf build
+mkdir build
+java -cp lib/antlr.jar org.antlr.v4.Tool -o build Micro.g4
+rm -rf classes
+mkdir classes
+javac -cp lib/antlr.jar -d classes src/*.java build/*.java
+java -cp lib/antlr-4.5.1-complete.jar:classes/ Micro ../step6/input/modular_copy.micro 
+;IR Code
+
+;LABEL calculatePOW
+;LINK
+;STOREF 1.0 $T0
+;NE $P2 $T0 label1
+;PUSH
+;JSR calculateModulus
+;POP $T1
+;STOREI $R
+;RET
+;JUMP label2
+;LABEL label1
+;PUSH
+;JSR calculateModulus
+;POP $T2
+;PUSH
+;JSR calculatePOW
+;POP $T3
+;PUSH
+;JSR getDivision
+;POP $T4
+;PUSH
+;JSR calculatePOW
+;POP $T5
+;MULTF null $P1 $T6
+;PUSH
+;JSR getDivision
+;POP $T7
+;SUBF $P2 $P2 $T8
+;STOREI $R
+;RET
+;LABEL label2
+;RET
+
+;LABEL main
+;LINK
+;WRITES line
+;WRITES getNum
+;READF $L1
+;WRITES getPower
+;READF $L2
+;WRITES getModulator
+;READF $L3
+;WRITES printResult
+;WRITEF $L4
+;STOREI 0 $R
+;RET
+str line "CHECKING OUT Modular Exponentiation Function Calls"
+str getNum "Please enter base number of exponentiation : "
+str getPower " Please enter power of exponentiation : "
+str getModulator "Please enter modulation factor : "
+str printResult "The RESULT IS -----------------------> : "
+str space " "
+str eol "\n"
+push
+push r0
+push r1
+push r2
+push r3
+jsr main
+sys halt
+label calculatePOW
+link 0
+move 1.0 r0
+cmpr $7 r0
+jne label1
+push
+push r0
+push r1
+push r2
+push r3
+jsr calculateModulus
+pop r3
+pop r2
+pop r1
+pop r0
+pop r0
